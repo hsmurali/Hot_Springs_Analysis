@@ -8,7 +8,7 @@
 #SBATCH --qos=large
 #SBATCH --mem=36gb
 #SBATCH --ntasks=8
-#SBATCH --array=1-1
+#SBATCH --array=2-34
 
 module load mash
 module load minimap
@@ -20,7 +20,7 @@ source activate /fs/cbcb-software/RedHat-7-x86_64/users/hsmurali/venvs/hotspring
 OSA=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/reassembly/missing_contig_comparison/novel_regions_in_contigs_filtered_representatives_mapping_to_osa.fna
 OSB=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/reassembly/missing_contig_comparison/novel_regions_in_contigs_filtered_representatives_mapping_to_osb.fna
 Neither=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/reassembly/missing_contig_comparison/novel_regions_in_contigs_filtered_representatives_mapping_to_neither.fna
-outdir=fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/reassembly/missing_contig_comparison/read_alignments/
+outdir=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/reassembly/missing_contig_comparison/read_alignments/
 reads_dir=/fs/cbcb-data/hotspring_metagenome/
 
 mkdir ${outdir}

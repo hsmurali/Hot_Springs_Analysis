@@ -20,7 +20,7 @@ def Load_PAF(filepath):
     return df
 
 data_path = sys.argv[1]
-filter_score = sya.argv[2]
+filter_score = float(sys.argv[2])
 
 files = listdir(data_path)
 
@@ -29,11 +29,11 @@ for f in files:
     if f.startswith('Hot'):
         df = Load_PAF(data_path+f)
         df = df[df['PIdent'] >= filter_score]
-        ref = f.replace(".paf").split('_')[-1]
-        sample = d.rename("_FD_"+ref+".paf","")
+        ref = f.replace(".paf","").split('_')[-1]
+        sample = f.replace("_FD_"+ref+".paf","")
         df['Sample'] = sample
         df['Ref'] = ref
         df_filtered_reads = df_filtered_reads.append(df, ignore_index = True)
-        print(f)
+        print(f, len(df))
 
 df_filtered_reads.to_csv(data_path+'Filtered_Reads.txt', sep = "\t")
