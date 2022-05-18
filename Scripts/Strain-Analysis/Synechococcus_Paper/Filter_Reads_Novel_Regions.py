@@ -3,6 +3,24 @@ import numpy as np
 import pandas as pd
 from os import listdir
 
+def Breadth_of_Coverage(group):
+    length = group.iloc[0]['SLen']
+    cov = np.zeros(length)
+    starts = group['SStart'].tolist()
+    ends = group['SEnd'].tolist()
+    for i in range(0, len(starts)):
+        cov[starts[i]:ends[i]]=1
+    return cov.sum()/length*100.0
+
+def Avg_Depth_of_Coverage(group):
+    length = group.iloc[0]['SLen']
+    cov = np.zeros(length)
+    starts = group['SStart'].tolist()
+    ends = group['SEnd'].tolist()
+    for i in range(0, len(starts)):
+        cov[starts[i]:ends[i]]+=1
+    return cov.mean()
+
 def Load_PAF(filepath):
     lines = open(filepath).readlines()
     header = ['Query','Qlen','QStart','QEnd','Orientation','Subject','SLen',
@@ -21,19 +39,26 @@ def Load_PAF(filepath):
 
 data_path = sys.argv[1]
 filter_score = float(sys.argv[2])
+out_dir = sys.argv[3]
 
-files = listdir(data_path)
+f = data_path.split("/")[-1]
+ref = f.replace(".paf","").split('_')[-1]
+sample = f.replace("_FD_"+ref+".paf","")
 
-df_filtered_reads = pd.DataFrame()
-for f in files:
-    if f.startswith('Hot'):
-        df = Load_PAF(data_path+f)
-        df = df[df['PIdent'] >= filter_score]
-        ref = f.replace(".paf","").split('_')[-1]
-        sample = f.replace("_FD_"+ref+".paf","")
-        df['Sample'] = sample
-        df['Ref'] = ref
-        df_filtered_reads = df_filtered_reads.append(df, ignore_index = True)
-        print(f, len(df))
+df = Load_PAF(data_path)
+df = df[df['PIdent'] >= filter_score]
 
-df_filtered_reads.to_csv(data_path+'Filtered_Reads.txt', sep = "\t")
+df_grouped = df.groupby(['Subject'])
+
+df_stats = pd.DataFrame()
+df_stats['Breadth_Coverage'] = df_grouped.apply(Breadth_of_Coverage)
+df_stats['Avg_Depth_Coverage'] = df_grouped.apply(Avg_Depth_of_Coverage)
+df_stats['Num_Reads'] = df_grouped['Query'].agg(['count'])
+df_stats[['Breadth_Coverage','Avg_Depth_Coverage']] = df_stats[['Breadth_Coverage','Avg_Depth_Coverage']].round(2)
+df_stats = df_stats.reset_index()
+df_stats['Sample'] = sample
+df_stats['Ref'] = ref
+
+print(df_stats.head())
+
+df_stats.to_csv(out_dir, sep = "\t")
