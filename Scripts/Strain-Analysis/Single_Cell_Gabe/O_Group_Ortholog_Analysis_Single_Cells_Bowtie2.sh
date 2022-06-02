@@ -4,13 +4,14 @@
 #SBATCH -e O_Ortholog_Cluster_Bowtie2.e%j # Name of Error File
 #SBATCH --mail-user=hsmurali@terpmail.umd.edu # Email for Job Info
 #SBATCH --mail-type=all
-#SBATCH --time=0-18:00:00
+#SBATCH --time=0-100:00:00
 #SBATCH --qos=large
 #SBATCH --mem=36gb
 #SBATCH --ntasks=8
-#SBATCH --array=1-1
+#SBATCH --array=2-34
 
 module load bowtie2/2.3.4
+module load k8
 module load minimap
 
 index_path=/fs/cbcb-lab/mpop/hotspring_metagenome/single_cell_analysis_with_Gabe_Birzu/map_to_O_allele/O_Orthogroup_Index
