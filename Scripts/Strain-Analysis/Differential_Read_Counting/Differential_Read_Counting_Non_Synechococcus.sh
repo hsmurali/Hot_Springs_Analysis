@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH -J Bowtie-Align-Synechococcus # Job name
-#SBATCH -o Bowtie-Align-Synechococcus.o # Name of output file
-#SBATCH -e Bowtie-Align-Synechococcus.e # Name of error file
+#SBATCH -J Non_Synechococcus_Alignments # Job name
+#SBATCH -o Non_Synechococcus_Alignments.o%j # Name of output file
+#SBATCH -e Non_Synechococcus_Alignments.e%j # Name of error file
 #SBATCH --mail-user=hsmurali@terpmail.umd.edu # Email for job info
 #SBATCH --mail-type=all # Get email for begin, end, and fail
 #SBATCH --time=5-00:00:00
@@ -24,7 +24,7 @@ index_path=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/R
 reads_dir=/fs/cbcb-data/hotspring_metagenome/
 outdir=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Non_Synechococcus_Alignments/
 
-mkdir ${OUTDIR}
+mkdir ${outdir}
 
 ls ${reads_dir} | grep "^Hot" > hotspring_samples.txt
 sample=`head -n ${SLURM_ARRAY_TASK_ID} hotspring_samples.txt | tail -n 1`
