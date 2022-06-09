@@ -1,7 +1,13 @@
 #!/bin/bash
+<<<<<<< HEAD
 #SBATCH -J Bowtie-Align-Non-Synechococcus # Job name
 #SBATCH -o Bowtie-Align-Non-Synechococcus.o%j # Name of output file
 #SBATCH -e Bowtie-Align-Non-Synechococcus.e%j # Name of error file
+=======
+#SBATCH -J Non_Synechococcus_Alignments # Job name
+#SBATCH -o Non_Synechococcus_Alignments.o%j # Name of output file
+#SBATCH -e Non_Synechococcus_Alignments.e%j # Name of error file
+>>>>>>> 171851e7f03316799b6b058b311d98d6aa83d9f1
 #SBATCH --mail-user=hsmurali@terpmail.umd.edu # Email for job info
 #SBATCH --mail-type=all # Get email for begin, end, and fail
 #SBATCH --time=0-18:00:00
