@@ -1,14 +1,14 @@
 #!/bin/bash
-#SBATCH -J Bowtie-Align-Synechococcus # Job name
-#SBATCH -o Bowtie-Align-Synechococcus.o # Name of output file
-#SBATCH -e Bowtie-Align-Synechococcus.e # Name of error file
+#SBATCH -J Bowtie-Align-Non-Synechococcus # Job name
+#SBATCH -o Bowtie-Align-Non-Synechococcus.o%j # Name of output file
+#SBATCH -e Bowtie-Align-Non-Synechococcus.e%j # Name of error file
 #SBATCH --mail-user=hsmurali@terpmail.umd.edu # Email for job info
 #SBATCH --mail-type=all # Get email for begin, end, and fail
-#SBATCH --time=5-00:00:00
+#SBATCH --time=0-18:00:00
 #SBATCH --qos=large
 #SBATCH --ntasks=5
 #SBATCH --mem=128gb
-#SBATCH --array=1
+#SBATCH --array=1-34
 
 module load bowtie2/2.3.4
 module load samtools/1.5
@@ -21,19 +21,20 @@ source activate /fs/cbcb-software/RedHat-7-x86_64/users/hsmurali/venvs/binnacle_
 genome=${1}
 
 index_path=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Ref_Genomes_Not_Syn/
-reads_dir=/fs/cbcb-data/hotspring_metagenome/
+reads_dir=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Reads_Reformatted/
 outdir=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Non_Synechococcus_Alignments/
 
-mkdir ${OUTDIR}
+mkdir ${outdir}
 
 ls ${reads_dir} | grep "^Hot" > hotspring_samples.txt
 sample=`head -n ${SLURM_ARRAY_TASK_ID} hotspring_samples.txt | tail -n 1`
 
-reads=${reads_dir}${sample}/QC_Filtered_Raw_Data/*.fastq.gz
+reads_1=${reads_dir}${sample}/${sample}_R1.fq.gz
+reads_2=${reads_dir}${sample}/${sample}_R2.fq.gz
 mkdir ${outdir}${genome}/
 mkdir ${outdir}${genome}/${sample}/
 
-bowtie2 -x ${index_path}${genome} -U ${reads} --no-unal | samtools view -bS | samtools sort -n > ${outdir}${genome}/${sample}/${genome}.bam
+bowtie2 -x ${index_path}${genome} -1 ${reads_1} -2 ${reads_2} --threads 32 --no-unal | samtools view -bS | samtools sort -n > ${outdir}${genome}/${sample}/${genome}.bam
 bamToBed -i ${outdir}${genome}/${sample}/${genome}.bam > ${outdir}${genome}/${sample}/${genome}.bed
 rm ${outdir}${genome}/${sample}/${genome}.bam
 

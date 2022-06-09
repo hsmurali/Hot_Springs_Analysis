@@ -26,7 +26,7 @@ def Load_PAF(filepath, o_cluster = True, filter_thresh = 90.0):
     return df
 
 pident_filter = float(sys.argv[1])
-data_dir = '/fs/cbcb-lab/mpop/hotspring_metagenome/single_cell_analysis_with_Gabe_Birzu/map_to_O_allele/'
+data_dir = '/fs/cbcb-lab/mpop/hotspring_metagenome/single_cell_analysis_with_Gabe_Birzu/map_to_O_allele/BowTie2_paf_files/'
 files = listdir(data_dir)
 df_op = pd.DataFrame()
 
@@ -36,4 +36,4 @@ for f in files:
         df = Load_PAF(data_dir+f, True, pident_filter)
         df['Sample'] = f.replace("_FD.paf","")
         df_op = df_op.append(df, ignore_index = True)
-df_op.to_csv('Filtered_O_Allele_Alignments.txt', sep = "\t")
+df_op.to_csv('/fs/cbcb-lab/mpop/hotspring_metagenome/single_cell_analysis_with_Gabe_Birzu/map_to_O_allele/Filtered_O_Allele_Alignments_Bowtie2.txt', sep = "\t")
