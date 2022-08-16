@@ -78,7 +78,6 @@ if not isfile(args.secondary_genome) and args.secondary_genome == "":
 	print("Secondary genome not found. Incorrect filepath!")
 	sys.exit(1)
 
-<<<<<<< HEAD
 command_primary = "minimap2 -t 8 " + args.primary_genome +" " + args.assembly +" > "+args.output_directory+"/"+args.prefix+args.primary_genome+".paf"
 result = subprocess.getoutput(command_primary)
 primary_alignments = Load_PAF(args.output_directory+"/"+args.prefix+args.primary_genome+".paf")
@@ -91,21 +90,7 @@ if args.secondary_genome != "":
 	result = subprocess.getoutput(command_primary)
 	secondary_alignments = Load_PAF(args.output_directory+"/"+args.prefix+args.secondary_genome+".paf")
 	G = Add_Additional_Attributes(secondary_alignments, args.secondary_genome_id, G, float(args.pident_thresh))
-=======
-command_primary = "minimap2 -t 8 " + args.primary_genome +" " + args.assembly +" > "+args.output_directory+"/"+args.prefix+args.primary_genome_id+".paf"
-result = subprocess.getoutput(command_primary)
-primary_alignments = Load_PAF(args.output_directory+"/"+args.prefix+args.primary_genome_id+".paf")
-G = nx.read_gml(args.assembly_graph)
-G = Add_Backbone_Alignment_Information(primary_alignments, args.primary_genome_id, G, float(args.pident_threshold))
 	
-if args.secondary_genome != "":
-	#### Align assemblies to the primary and secondary genomes...
-	command_secondary = "minimap2 -t 8 " + args.secondary_genome +" " + args.assembly +" > "+args.output_directory+"/"+args.prefix+args.secondary_genome_id+".paf"
-	result = subprocess.getoutput(command_secondary)
-	secondary_alignments = Load_PAF(args.output_directory+"/"+args.prefix+args.secondary_genome_id+".paf")
-	G = Add_Additional_Attributes(secondary_alignments, args.secondary_genome_id, G, float(args.pident_threshold))
->>>>>>> 0d32ed0491472f5b03e80390c71960b3949efc17
-
 connected_components = list(nx.weakly_connected_components(G))
 out_list = []
 for c in connected_components:
@@ -114,8 +99,4 @@ for c in connected_components:
 	out_list += out
 	
 df_scaffolds = pd.DataFrame(out_list)
-<<<<<<< HEAD
 df_scaffolds.to_csv(args.output_directory+"/"+args.prefix+args.primary_genome+".txt", sep = "\t")
-=======
-df_scaffolds.to_csv(args.output_directory+"/"+args.prefix+args.primary_genome_id+".txt", sep = "\t")
->>>>>>> 0d32ed0491472f5b03e80390c71960b3949efc17
