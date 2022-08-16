@@ -1,7 +1,11 @@
+#!/usr/bin/env python
+# coding: utf-8
+
 import sys
-import numpy as np
-import pandas as pd
 from os import listdir
+
+import pandas as pd
+import numpy as np
 
 def Breadth_of_Coverage(group):
     length = group.iloc[0]['SLen']

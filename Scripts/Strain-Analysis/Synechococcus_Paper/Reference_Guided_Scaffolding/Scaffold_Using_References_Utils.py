@@ -2,9 +2,40 @@ import numpy as np
 import pandas as pd
 import networkx as nx
 
+def Stitch_Alignments(group):
+	group = group.sort_values(by = 'QStart')
+	Qstarts = group['QStart'].tolist()
+	Qends = group['QEnd'].tolist()
+	Sstarts = group['SStart'].tolist()
+	Sends = group['SEnd'].tolist()
+	Matches = group['Matches'].tolist()
+	PIdents = group['PIdent'].tolist()
+	Align_Lengths = group['AlignLength'].tolist()
+	Orients = group['Orientation'].tolist()
+	
+	num_matches = Align_Lengths[0]*PIdents[0]/100.0
+	num_gaps = 0
+	orientation = Orients[0]
+	max_Align = Align_Lengths[0]
+	
+	for i in range(1, len(Qstarts)):
+		gap = Qends[i-1] - Qstarts[i]
+		if gap > 0:
+			num_gaps += gap
+		if Align_Lengths[i] > max_Align:
+			max_Align = Align_Lengths[i]
+			orientation = Orients[i]
+		num_matches += Align_Lengths[i]*PIdents[i]/100
+		
+	return pd.Series({'Qlen':group.iloc[0]['Qlen'], 'QStart':min(Qstarts), 'QEnd':max(Qends), 
+					  'Orientation':orientation, 'SLen':group.iloc[0]['SLen'], 'SStart':min(Sstarts), 
+					  'SEnd':max(Sends), 'Matches':num_matches,'AlignLength':max(Qends)-min(Qstarts),
+					  'PIdent':num_matches/group.iloc[0]['Qlen']*100.0})
+
+		
 def Load_PAF(filepath):
 	lines = open(filepath).readlines()
-	header = ['Query','Qlen','QStart','QEnd','Orientation','Subject','SLen',
+	header = ['Query','Qlen','QStart','QEnd','Orientation','Subject','SLen', 
 			  'SStart','SEnd','Matches','AlignLength','MAPQ']
 	op = []
 	for l in lines:
@@ -14,8 +45,9 @@ def Load_PAF(filepath):
 	df[['Qlen','QStart','QEnd','SLen','SStart',
 		'SEnd','Matches','AlignLength','MAPQ']] = df[['Qlen','QStart','QEnd','SLen','SStart',
 													  'SEnd','Matches','AlignLength','MAPQ']].astype('int')
-	df['PIdent'] = df['AlignLength']/df['Qlen']*100
-	df = df.loc[df.groupby(['Query'])['PIdent'].idxmax()]
+	df['PIdent'] = df['Matches']/df['AlignLength']*100
+	df = df.groupby(['Query','Subject']).apply(Stitch_Alignments)
+	df = df.reset_index()
 	return df
 
 def Add_Backbone_Alignment_Information(df_mm2, genome_id, G, quality = 80):
