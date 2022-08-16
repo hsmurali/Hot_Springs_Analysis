@@ -8,13 +8,13 @@
 #SBATCH --qos=large
 #SBATCH --mem=128gb
 #SBATCH --ntasks=8
-#SBATCH --array=1-1
+#SBATCH --array=1-34
 
 module load minimap
-#module load anaconda
+module load anaconda
 module load samtools
 
-#source activate /fs/cbcb-software/RedHat-7-x86_64/users/hsmurali/venvs/hotsprings_utils
+source activate /fs/cbcb-software/RedHat-7-x86_64/users/hsmurali/venvs/hotsprings_utils
 
 wrkpath=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Ref_Guided_Scaffolding_Clustering_Aug_2022/
 feature_contigs=${wrkpath}BLAST_All_vs_All/Representatives_Filtered.fasta
