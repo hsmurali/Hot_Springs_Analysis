@@ -8,13 +8,13 @@
 #SBATCH --qos=workstation
 #SBATCH --mem=36gb
 #SBATCH --ntasks=8
-#SBATCH --array=1-378
+#SBATCH --array=2-378
 
 module load minimap
 
-data_dir=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/single_cell_assemblies/
-novel_contigs=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/reassembly/missing_contig_comparison/updated_contaiments_june2022/contig_containment_groups_subset_rep_contigs_formatted.fna
-out_dir=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/mapping_to_novel_contigs_june2022/
+data_dir=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/single_cell_assemblies/
+novel_contigs=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Ref_Guided_Scaffolding_Clustering_Aug_2022/BLAST_All_vs_All/Representatives_Filtered.fasta
+out_dir=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Ref_Guided_Scaffolding_Clustering_Aug_2022/Single_Cell_Analysis/
 mkdir ${out_dir}
 
 ls ${data_dir} | grep "^Uncmic" > single_cells.txt
