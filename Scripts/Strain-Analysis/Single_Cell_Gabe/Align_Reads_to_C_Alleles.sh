@@ -8,6 +8,7 @@
 #SBATCH --qos=large
 #SBATCH --mem=36gb
 #SBATCH --ntasks=32
+#SBATCH --array=1-1
 
 module load samtools/1.7
 module load bedtools/2.26.0
