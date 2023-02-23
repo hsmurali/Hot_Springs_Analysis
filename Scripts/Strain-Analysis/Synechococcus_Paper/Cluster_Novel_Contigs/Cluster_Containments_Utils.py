@@ -123,7 +123,6 @@ def Summarize_Group(group):
             osa_counts += 1
         if 'osb' in c:
             osb_counts += 1
-        contigs = list(set(d[g])) + list(set(d_representatives[g]))
         for m in ['MS50','MS55','MS60','MS65']:
             if m in c:
                 MS.append(m)

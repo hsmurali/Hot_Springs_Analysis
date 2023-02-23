@@ -54,7 +54,7 @@ requiredNamed.add_argument("-AG", "--assembly_graph", help="Path to the Assembly
 requiredNamed.add_argument("-O", "--output_directory", help="Path to the output directory.", required=True)
 
 optionalNamed.add_argument("-G1","--primary_genome_id", help="Genome ID of the primary genome", required=False, default = "G1")
-optionalNamed.add_argument("-G2_Ref", "--secondary_genome", help="Path to the fasta file of the secondary reference.", required=True, default="")
+optionalNamed.add_argument("-G2_Ref", "--secondary_genome", help="Path to the fasta file of the secondary reference.", required=False, default="")
 optionalNamed.add_argument("-G2","--secondary_genome_id", help="Genome ID of the secondary genome", required=False, default = "G2")
 optionalNamed.add_argument("-d", "--pident_threshold", help="Threshold to consider for backbone alignment.", required=False, default="80.0")
 requiredNamed.add_argument("-pre", "--prefix", help="Prefix for output files.", required=False, default="Assembly.")
@@ -74,22 +74,22 @@ if not isfile(args.primary_genome):
 	print("Primary genome not found. Incorrect filepath!")
 	sys.exit(1)
 
-if not isfile(args.secondary_genome) and args.secondary_genome == "":
+if not isfile(args.secondary_genome) and args.secondary_genome != "":
 	print("Secondary genome not found. Incorrect filepath!")
 	sys.exit(1)
 
-command_primary = "minimap2 -t 8 " + args.primary_genome +" " + args.assembly +" > "+args.output_directory+"/"+args.prefix+args.primary_genome+".paf"
+command_primary = "minimap2 -t 8 " + args.primary_genome +" " + args.assembly +" > "+args.output_directory+"/"+args.prefix+args.primary_genome_id+".paf"
 result = subprocess.getoutput(command_primary)
-primary_alignments = Load_PAF(args.output_directory+"/"+args.prefix+args.primary_genome+".paf")
+primary_alignments = Load_PAF(args.output_directory+"/"+args.prefix+args.primary_genome_id+".paf")
 G = nx.read_gml(args.assembly_graph)
-G = Add_Backbone_Alignment_Information(primary_alignments, args.primary_genome_id, G, float(args.pident_thresh))
+G = Add_Backbone_Alignment_Information(primary_alignments, args.primary_genome_id, G, float(args.pident_threshold))
 	
 if args.secondary_genome != "":
 	#### Align assemblies to the primary and secondary genomes...
 	command_secondary = "minimap2 -t 8 " + args.secondary_genome +" " + args.assembly +" > "+args.output_directory+"/"+args.prefix+args.secondary_genome+".paf"
 	result = subprocess.getoutput(command_primary)
 	secondary_alignments = Load_PAF(args.output_directory+"/"+args.prefix+args.secondary_genome+".paf")
-	G = Add_Additional_Attributes(secondary_alignments, args.secondary_genome_id, G, float(args.pident_thresh))
+	G = Add_Additional_Attributes(secondary_alignments, args.secondary_genome_id, G, float(args.pident_threshold))
 	
 connected_components = list(nx.weakly_connected_components(G))
 out_list = []
@@ -99,4 +99,4 @@ for c in connected_components:
 	out_list += out
 	
 df_scaffolds = pd.DataFrame(out_list)
-df_scaffolds.to_csv(args.output_directory+"/"+args.prefix+args.primary_genome+".txt", sep = "\t")
+df_scaffolds.to_csv(args.output_directory+"/"+args.prefix+args.primary_genome_id+".txt", sep = "\t")
