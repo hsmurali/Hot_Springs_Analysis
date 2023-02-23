@@ -17,17 +17,15 @@ module load samtools
 source activate /fs/cbcb-software/RedHat-7-x86_64/users/hsmurali/venvs/hotsprings_utils
 
 wrkpath=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Ref_Guided_Scaffolding_Clustering_Aug_2022/
-feature_contigs=${wrkpath}BLAST_All_vs_All/Representatives_Filtered.fasta
+feature_contigs=${wrkpath}BLAST_All_vs_All_75_5_75_500/Representatives.fasta
 reads_dir=/fs/cbcb-data/hotspring_metagenome/
-outdir=${wrkpath}Read_Alignments_to_Novel_Contigs/
+outdir=${wrkpath}Read_Alignments_to_Novel_Contigs_75_5_75_500/
 mkdir ${outdir}
 
 ls ${reads_dir} | grep "^Hot" > hotspring_samples.txt
 sample=`head -n ${SLURM_ARRAY_TASK_ID} hotspring_samples.txt | tail -n 1`
-sample=HotsprSampleR4cd_FD
-
 #minimap2 -t 8 ${feature_contigs} ${reads_dir}${sample}/QC_Filtered_Raw_Data/*.fastq.gz > ${outdir}${sample}.paf
 
 mkdir ${outdir}Summarized_Coverages/
-prog_dir=/fs/cbcb-scratch/hsmurali/Hot_Springs_Analysis/Scripts/Strain-Analysis/Synechococcus_Paper/Filter_Reads_Novel_Regions.py
+prog_dir=/fs/cbcb-scratch/hsmurali/Hot_Springs_Analysis/Scripts/Strain-Analysis/Synechococcus_Paper/Cluster_Novel_Segments_Across_Samples/Filter_Reads_Novel_Regions.py 
 python ${prog_dir} ${outdir}${sample}.paf 95.0 ${outdir}Summarized_Coverages/${sample}.txt

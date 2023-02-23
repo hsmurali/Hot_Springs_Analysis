@@ -1,0 +1,3 @@
+mkdir: cannot create directory ‘/fs/cbcb-lab/mpop/hotspring_metagenome/single_cell_analysis_with_Gabe_Birzu/16S_Blast_Alignments/Alpha_Alleles/’: File exists
+mkdir: cannot create directory ‘/fs/cbcb-lab/mpop/hotspring_metagenome/single_cell_analysis_with_Gabe_Birzu/16S_Blast_Alignments/Alpha_Alleles/bam_files/’: File exists
+mkdir: cannot create directory ‘/fs/cbcb-lab/mpop/hotspring_metagenome/single_cell_analysis_with_Gabe_Birzu/16S_Blast_Alignments/Alpha_Alleles/paf_files/’: File exists

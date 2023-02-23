@@ -13,8 +13,8 @@
 module load minimap
 
 data_dir=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/single_cell_assemblies/
-novel_contigs=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Ref_Guided_Scaffolding_Clustering_Aug_2022/BLAST_All_vs_All/Representatives_Filtered.fasta
-out_dir=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Ref_Guided_Scaffolding_Clustering_Aug_2022/Single_Cell_Analysis/
+novel_contigs=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Ref_Guided_Scaffolding_Clustering_Aug_2022/BLAST_All_vs_All_75_5_75_500/Representatives.fasta
+out_dir=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Ref_Guided_Scaffolding_Clustering_Aug_2022/Single_Cell_Analysis_75_5_75_500/
 mkdir ${out_dir}
 
 ls ${data_dir} | grep "^Uncmic" > single_cells.txt

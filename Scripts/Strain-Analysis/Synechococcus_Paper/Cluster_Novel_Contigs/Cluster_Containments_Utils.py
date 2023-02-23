@@ -116,11 +116,21 @@ def Summarize_Group(group):
     osa_counts, osb_counts = 0, 0
     contigs_counts = len(contigs)
     rep_length = group.iloc[0]['RepresentativeLength']
+    MS = []
+    OS = []
     for c in contigs:
         if 'osa' in c:
             osa_counts += 1
         if 'osb' in c:
             osb_counts += 1
+        for m in ['MS50','MS55','MS60','MS65']:
+            if m in c:
+                MS.append(m)
+        for m in ['OS50','OS55','OS60','OS65']:
+            if m in c:
+                OS.append(m)
     return pd.Series({'RepresentativeContig':group.iloc[0]['RepresentativeContig'], 
                       'RepresentativeLength':rep_length, 'NumContigs':contigs_counts, 
-                      'OSA_Counts':osa_counts, 'OSB_Counts':osb_counts})
+                      'OSA_Counts':osa_counts, 'OSB_Counts':osb_counts, 
+                      'MS-Temperature-Gradient':sorted(list(set(MS))), 
+                      'OS-Temperature-Gradient':sorted(list(set(OS)))})
