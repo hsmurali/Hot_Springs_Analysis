@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 import networkx as nx
 from Bio import SeqIO
-from os import listdir
+from os import listdir,mkdir
+from os.path import isdir,isfile
 from functools import partial 
 
 def Load_Contigs(contigs_path, sample="", genome=""):
