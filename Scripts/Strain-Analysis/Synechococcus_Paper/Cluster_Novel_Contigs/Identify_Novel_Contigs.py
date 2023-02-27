@@ -1,40 +1,41 @@
 import sys
 from Cluster_Containments_Utils import *
+import argparse as ap
 
-osa_assembly_directory = sys.argv[1]
-osb_assembly_directory = sys.argv[2]
-osa_ref_scaffold_directory = sys.argv[3]
-osb_ref_scaffold_directory = sys.argv[4]
-output = sys.argv[5]
+if __name__ == '__main__':
+    parser = ap.ArgumentParser(description="Load and filter novel contigs.")
+    requiredNamed = parser.add_argument_group('required named arguments')
+    requiredNamed.add_argument("-a", "--assembly_directories", help="Path to the directories containing the assemblies.", nargs = '+', required=True)
+    requiredNamed.add_argument("-g", "--genomes", help="List of genomes that were assembled and scaffolded using references", nargs = '+', required=True)
+    requiredNamed.add_argument("-o", "--output_directory", help = "Location to write oputputs to.", required = True)
 
-samples = listdir(osa_ref_scaffold_directory)
-OSA_Contig_Map = {}
-OSA_Variant_Contigs = []
-for s in samples:
-    if (s.startswith("Hot") and s.endswith(".txt")):
-        s = s.replace(".txt","")
-        d = Load_Contigs(osa_assembly_directory+s+'_megahit_assembled_contigs_osa/'+s+'_osa.contigs.fa', s, 'osa')
-        OSA_Contig_Map.update(d)
-        OSA_Variant_Contigs += (Load_and_Filter_Contigs(osa_ref_scaffold_directory+s+'.txt', s, 'osa'))
+    args = parser.parse_args()
+    assembly_directory = args.assembly_directories
+    genomes = args.genomes
+    output = args.output_directory
 
+    if output[-1] == '/':
+        output += '/'
 
-samples = listdir(osb_ref_scaffold_directory)
-OSB_Contig_Map = {}
-OSB_Variant_Contigs = []
-for s in samples:
-    if (s.startswith("Hot") and s.endswith(".txt")):
-        s = s.replace(".txt","")
-        d = Load_Contigs(osb_assembly_directory+s+'_megahit_assembled_contigs_osb/'+s+'_osb.contigs.fa', s, 'osb')
-        OSB_Contig_Map.update(d)
-        OSB_Variant_Contigs += (Load_and_Filter_Contigs(osb_ref_scaffold_directory+s+'.txt', s, 'osb'))
+    contigs = {}
+    variant_contigs = []
 
-o = open(output,'w')
-for c in OSA_Variant_Contigs:
-    o.write('>'+c+'\n')
-    o.write(OSA_Contig_Map[c]+'\n')
+    for i in range(len(assembly_directories)):
+        samples = listdir(assembly_directories[i] +'/')
+        for s in samples:
+            if s.startswith('Hot'):
+                assembly = assembly_directories[i] +'/'+s+'/Megahit_Contigs/final.contigs.fa'
+                ref_scaffolds = assembly_directories[i] +'/'+s+'/reference_guided_scaffolds/Ref_Guided_Scaffolds'+genomes[i]+'.txt'
+                s = s.replace(".txt","")
+                d = Load_Contigs(assembly, s, genomes[i])
+                contigs.update(d)
+                variant_contigs += (Load_and_Filter_Contigs(ref_scaffolds,s,genomes[i]))
 
-for c in OSB_Variant_Contigs:
-    o.write('>'+c+'\n')
-    o.write(OSB_Contig_Map[c]+'\n')
+    if not isdir(output):
+        mkdir(output)
 
-o.close()
+    o = open(output+'Novel_Contigs.fna','w')
+    for c in variant_contigs:
+        o.write('>'+c+'\n')
+        o.write(contigs[c]+'\n')
+    o.close()

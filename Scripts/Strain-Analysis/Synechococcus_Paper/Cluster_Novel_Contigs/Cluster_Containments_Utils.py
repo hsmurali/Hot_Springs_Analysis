@@ -5,11 +5,14 @@ from Bio import SeqIO
 from os import listdir
 from functools import partial 
 
-def Load_Contigs(contigs_path, sample, genome):
+def Load_Contigs(contigs_path, sample="", genome=""):
     d = {}
     fasta_sequences = SeqIO.parse(open(contigs_path),'fasta')
     for s in fasta_sequences:
-        d[sample+'_'+genome+'_'+s.name] = str(s.seq)
+        if genome == "" and sample == "":
+            d[s.name] = str(s.seq)
+        else:
+            d[sample+'_'+genome+'_'+s.name] = str(s.seq)
     return d
 
 def Load_and_Filter_Contigs(contig_path, sample, genome, length_filter = 500):

@@ -21,8 +21,13 @@ df_eggnog = df_eggnog.reset_index()
 df_blast = pd.read_csv(synechococcus_blast, sep = "\t",names=['qseqid', 'sseqid', 'pident', 'length', 'mismatch', 
                                                               'gapopen', 'qlen', 'qstart', 'qend', 'slen', 
                                                               'sstart', 'send', 'evalue', 'bitscore'])
+
 df_blast['sseqid'] = df_blast['sseqid'].replace("gi|86604733|ref|NC_007775.1|","OSA")
 df_blast['sseqid'] = df_blast['sseqid'].replace("gi|86607503|ref|NC_007776.1|","OSB")
+df_blast['sseqid'] = df_blast['sseqid'].replace("NC_016024.1","Chloracidobacterium")
+df_blast['sseqid'] = df_blast['sseqid'].replace("KI911784.1","Chloroflexus")
+df_blast['sseqid'] = df_blast['sseqid'].replace("NC_009523.1","Roseiflexus")
+
 grouped = df_blast.groupby(['qseqid','sseqid'])
 
 df_blast_grouped = pd.DataFrame()
@@ -34,7 +39,10 @@ df_blast_grouped = df_blast_grouped.reset_index()
 df_blast_grouped = df_blast_grouped.reset_index().rename(columns = {'qseqid':'RepresentativeContig'})
 df_blast_grouped = df_blast_grouped.set_index('RepresentativeContig')
 del df_blast_grouped['index']
-df_blast_grouped = df_blast_grouped.rename(columns={'OSA':'OSA_Cov', 'OSB':'OSB_Cov'})
+df_blast_grouped = df_blast_grouped.rename(columns={'OSA':'OSA_Cov', 'OSB':'OSB_Cov',
+                                                    'Chloracidobacterium':'Chloracidobacterium_Cov',
+                                                    'Chloroflexus':'Chloroflexus_Cov',
+                                                    'Roseiflexus':'Roseiflexus_Cov'})
 
 df_eggnog = df_eggnog.merge(df_blast_grouped, on = 'RepresentativeContig', how = 'left')
 del df_eggnog['index']

@@ -1,11 +1,11 @@
 #!/bin/bash
-#SBATCH -J Cluster_Novel_Contigs # Job name
-#SBATCH -o Cluster_Novel_Contigs.o # Name of output file
-#SBATCH -e Cluster_Novel_Contigs.e # Name of error file
+#SBATCH -J Cluster_Novel_Contigs_OSA # Job name
+#SBATCH -o Cluster_Novel_Contigs_OSA.o # Name of output file
+#SBATCH -e Cluster_Novel_Contigs_OSA.e # Name of error file
 #SBATCH --mail-user=hsmurali@terpmail.umd.edu # Email for job info
 #SBATCH --mail-type=ALL # Get email for begin, end, and fail
 #SBATCH --nodes=1
-#SBATCH	--ntasks=24
+#SBATCH --ntasks=24
 #SBATCH --time=24:00:00
 #SBATCH --qos=large
 #SBATCH --mem=128gb
@@ -18,81 +18,64 @@ export LD_LIBRARY_PATH="/fs/cbcb-software/RedHat-7-x86_64/common/local/sqlite/3.
 
 source activate /fs/cbcb-software/RedHat-7-x86_64/users/hsmurali/venvs/hotsprings_utils/
 
-outdir=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Ref_Guided_Scaffolding_Clustering_Aug_2022/BLAST_All_vs_All_90_5_75_500/
-mkdir ${outdir}
+genome=OSA
+data_dir=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Hotsprings_Variant_Structure/${genome}/
+output_dir=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Hotsprings_Variant_Structure_Data_Analysis/
+mkdir ${output_dir}
+mkdir ${output_dir}${genome}/
 
-osa_assembly_directory=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/reassembly/assembly_and_scaffolds/osa/
-osb_assembly_directory=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/reassembly/assembly_and_scaffolds/osb/
-osa_ref_scaffold_directory=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Ref_Guided_Scaffolding_Clustering_Aug_2022/Missing_Contig_Coords_Aug/OSA/
-osb_ref_scaffold_directory=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Ref_Guided_Scaffolding_Clustering_Aug_2022/Missing_Contig_Coords_Aug/OSB/
-output=${outdir}Novel_Contigs.fna
 srcdir=/fs/cbcb-scratch/hsmurali/Hot_Springs_Analysis/Scripts/Strain-Analysis/Synechococcus_Paper/Cluster_Novel_Contigs/
 
-python ${srcdir}Identify_Novel_Contigs.py ${osa_assembly_directory} \
-                                          ${osb_assembly_directory} \
-                                          ${osa_ref_scaffold_directory} \
-                                          ${osb_ref_scaffold_directory} \
-                                          ${output}
+python ${srcdir}Identify_Novel_Contigs.py -a ${data_dir} \
+										  -g ${genome} \
+										  -o ${output_dir}${genome}/
 
 makeblastdb -dbtype nucl \
-            -in ${output} \
-            -input_type fasta \
-            -parse_seqids \
-            -out ${outdir}Novel_Contigs.db 
-blastn -db ${outdir}Novel_Contigs.db \
-       -query ${output} \
-       -out ${outdir}/Novel_Contigs_All_vs_All.txt \
+			-in ${output_dir}${genome}/Novel_Contigs.fna \
+			-input_type fasta \
+			-parse_seqids \
+			-out ${output_dir}${genome}/Novel_Contigs.db
+blastn -db ${output_dir}${genome}/Novel_Contigs.db \
+	   -query ${output_dir}${genome}/Novel_Contigs.fna \
+	   -out ${output_dir}${genome}/Novel_Contigs_All_vs_All.txt \
+	   -num_threads 16 \
        -outfmt "6 qseqid sseqid pident length mismatch gapopen qlen qstart qend slen sstart send evalue bitscore" \
-       -num_threads 16
+python ${srcdir}Cluster_Novel_Contigs.py -a ${output_dir}${genome}/Novel_Contigs_All_vs_All.txt \
+										 -O ${output_dir}${genome}/ -s ${output_dir}${genome}/Novel_Contigs.fna \
+										 -c 90 -n 5 -r 75 -l 500
 
-python ${srcdir}Cluster_Novel_Contigs.py ${outdir}/Novel_Contigs_All_vs_All.txt \
-                                         90 \
-                                         5 \
-                                         75 \
-                                         500 \
-                                         ${outdir}containment_clusters.txt \
-                                         ${osa_assembly_directory} \
-                                         ${osb_assembly_directory} \
-                                         ${outdir}Representatives.fasta
-
-REFPTH=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/Synechococcus_references
-cat ${REFPTH}/Synechococcus_OS-A_genome.fasta ${REFPTH}/Synechococcus_OS-B_genome.fasta > ${outdir}Synechococcus_References.fna
+REFPTH=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/Ref_Genomes_Not_Syn/Synechococcus_OS-A_genome.fasta
 makeblastdb -dbtype nucl \
-            -input_type fasta \
-            -in ${outdir}Synechococcus_References.fna \
-            -parse_seqids \
-            -out ${outdir}Synechococcus.db
-blastn -db ${outdir}Synechococcus.db \
-       -query ${outdir}Representatives.fasta \
-       -out ${outdir}Representatives.Syenchococcus.blast \
+			-input_type fasta \
+			-in ${REFPTH} \
+			-parse_seqids \
+			-out ${output_dir}${genome}/${genome}.db
+blastn -db ${output_dir}${genome}/${genome}.db \
+	   -query ${output_dir}${genome}/Representatives.fasta \
+       -out ${output_dir}${genome}/Representatives.${genome}.blast \
        -outfmt "6 qseqid sseqid pident length mismatch gapopen qlen qstart qend slen sstart send evalue bitscore"
 
-mkdir ${outdir}Prodigal/
-prodigal -i ${outdir}Representatives.fasta \
-         -a ${outdir}Prodigal/Representatives_Prodigal.faa \
-         -d ${outdir}Prodigal/Representatives_Prodigal.fna \
-         -o ${outdir}Prodigal/Representatives_Prodigal.out
+mkdir ${output_dir}${genome}/Prodigal/
+prodigal -i ${output_dir}${genome}/Representatives.fasta \
+         -a ${output_dir}${genome}/Prodigal/Representatives_Prodigal.faa \
+         -d ${output_dir}${genome}/Prodigal/Representatives_Prodigal.fna \
+         -o ${output_dir}${genome}/Prodigal/Representatives_Prodigal.out
 
-mkdir ${outdir}EggNOG/
+eggnog_db_path=/fs/cbcb-lab/mpop/MetaCarvel_paper/hmp_scaffolds/eggnog_functional_comparison/databases/
+mkdir ${output_dir}${genome}/EggNOG/
 python3 -c "import sqlite3; print(sqlite3. sqlite_version)"
-emapper.py --version --data_dir /fs/cbcb-lab/mpop/MetaCarvel_paper/hmp_scaffolds/eggnog_functional_comparison/databases/
-emapper.py -m diamond \
-           --no_annot \
-           --no_file_comments \
-           --cpu 24 \
-           --data_dir /fs/cbcb-lab/mpop/MetaCarvel_paper/hmp_scaffolds/eggnog_functional_comparison/databases/ \
-           -i ${outdir}Prodigal/Representatives_Prodigal.faa \
-           --output ${outdir}/EggNOG/Representatives.eggnog.out
-
+emapper.py --version --data_dir ${eggnog_db_path}
+emapper.py -m diamond --no_annot --no_file_comments --cpu 24 \
+		   --data_dir ${eggnog_db_path} \
+           -i ${output_dir}${genome}/Prodigal/Representatives_Prodigal.faa \
+           --output ${output_dir}${genome}/EggNOG/Representatives.eggnog.out
 emapper.py -m no_search \
-           --annotate_hits_table ${outdir}/EggNOG/Representatives.eggnog.out.emapper.seed_orthologs \
-           --no_file_comments \
-           -o ${outdir}/EggNOG/Representatives.eggnog.out \
+		   --annotate_hits_table ${output_dir}${genome}/EggNOG/Representatives.eggnog.out.emapper.seed_orthologs \
+           --no_file_comments -o ${output_dir}${genome}/EggNOG/Representatives.eggnog.out \
            --cpu 24 \
-           --data_dir /fs/cbcb-lab/mpop/MetaCarvel_paper/hmp_scaffolds/eggnog_functional_comparison/databases \
-           --dbmem
+           --data_dir ${eggnog_db_path} --dbmem
 
-python ${srcdir}Post_Process_EggNOG_Annotations.py ${outdir}EggNOG/Representatives.eggnog.out.emapper.annotations \
-                                                   ${outdir}containment_clusters.txt \
-                                                   ${outdir}Representatives.Syenchococcus.blast \
-                                                   ${outdir}EggNOG.Annotation.xlsx
+python ${srcdir}Post_Process_EggNOG_Annotations.py ${output_dir}${genome}/EggNOG/Representatives.eggnog.out.emapper.annotations \
+                                                   ${output_dir}${genome}/containment_clusters.txt \
+                                                   ${output_dir}${genome}/Representatives.${genome}.blast \
+                                                   ${output_dir}${genome}/EggNOG.Annotation.xlsx
