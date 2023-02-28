@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH -J Cluster_Novel_Contigs_OSA # Job name
-#SBATCH -o Cluster_Novel_Contigs_OSA.o # Name of output file
-#SBATCH -e Cluster_Novel_Contigs_OSA.e # Name of error file
+#SBATCH -J Cluster_Novel_Contigs.Chloracidobacterium_thermophilum_B # Job name
+#SBATCH -o Cluster_Novel_Contigs.Chloracidobacterium_thermophilum_B.o # Name of output file
+#SBATCH -e Cluster_Novel_Contigs.Chloracidobacterium_thermophilum_B.e # Name of error file
 #SBATCH --mail-user=hsmurali@terpmail.umd.edu # Email for job info
 #SBATCH --mail-type=ALL # Get email for begin, end, and fail
 #SBATCH --nodes=1
@@ -18,7 +18,7 @@ export LD_LIBRARY_PATH="/fs/cbcb-software/RedHat-7-x86_64/common/local/sqlite/3.
 
 source activate /fs/cbcb-software/RedHat-7-x86_64/users/hsmurali/venvs/hotsprings_utils/
 
-genome=OSA
+genome=Chloracidobacterium_thermophilum_B
 data_dir=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Hotsprings_Variant_Structure/${genome}/
 output_dir=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Hotsprings_Variant_Structure_Data_Analysis/
 mkdir ${output_dir}
@@ -26,9 +26,7 @@ mkdir ${output_dir}${genome}/
 
 srcdir=/fs/cbcb-scratch/hsmurali/Hot_Springs_Analysis/Scripts/Strain-Analysis/Synechococcus_Paper/Cluster_Novel_Contigs/
 
-python ${srcdir}Identify_Novel_Contigs.py -a ${data_dir} \
-										  -g ${genome} \
-										  -o ${output_dir}${genome}/
+python ${srcdir}Identify_Novel_Contigs.py -a ${data_dir} -g ${genome} -o ${output_dir}${genome}/
 
 makeblastdb -dbtype nucl \
 			-in ${output_dir}${genome}/Novel_Contigs.fna \
@@ -38,13 +36,14 @@ makeblastdb -dbtype nucl \
 blastn -db ${output_dir}${genome}/Novel_Contigs.db \
 	   -query ${output_dir}${genome}/Novel_Contigs.fna \
 	   -out ${output_dir}${genome}/Novel_Contigs_All_vs_All.txt \
-	   -num_threads 16 \
-       -outfmt "6 qseqid sseqid pident length mismatch gapopen qlen qstart qend slen sstart send evalue bitscore" \
+	   -num_threads 24 \
+       -outfmt "6 qseqid sseqid pident length mismatch gapopen qlen qstart qend slen sstart send evalue bitscore" 
+
 python ${srcdir}Cluster_Novel_Contigs.py -a ${output_dir}${genome}/Novel_Contigs_All_vs_All.txt \
 										 -O ${output_dir}${genome}/ -s ${output_dir}${genome}/Novel_Contigs.fna \
 										 -c 90 -n 5 -r 75 -l 500
 
-REFPTH=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/Ref_Genomes_Not_Syn/Synechococcus_OS-A_genome.fasta
+REFPTH=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/Ref_Genomes_Not_Syn/Chloracidobacterium_thermophilum_B.fna
 makeblastdb -dbtype nucl \
 			-input_type fasta \
 			-in ${REFPTH} \

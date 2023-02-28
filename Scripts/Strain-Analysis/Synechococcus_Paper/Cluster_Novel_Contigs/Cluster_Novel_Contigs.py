@@ -14,7 +14,7 @@ if __name__ == '__main__':
 	optionalNamed.add_argument("-c", "--contianment_threshold", help="Threshold to declare containments", required=False, default = "90")
 	optionalNamed.add_argument("-n", "--num_contigs", help="Number of Contigs in the containment group to be reported as novel.", required=False, default="5")
 	optionalNamed.add_argument("-r", "--representative_coverage", help="Fraction of representative contig to be covered.", required=False, default = "75")
-	optionalNamed.add_argument("-l", "--length_representaive", help="Threshold to filter representative", required=False, default="500.0")
+	optionalNamed.add_argument("-l", "--length_representative", help="Threshold to filter representative", required=False, default="500.0")
 
 	args = parser.parse_args()
 
@@ -23,10 +23,10 @@ if __name__ == '__main__':
 	num_contigs_thresh = int(args.num_contigs)
 	rep_cov_thresh = float(args.representative_coverage)
 	rep_length_thresh = int(args.length_representative)
-	clusters_output = args.output_directory
+	output_directory = args.output_directory
 	novel_contigs = args.novel_contigs
 
-	df_blast_iter = pd.read_csv(blast_path, sep = "\t",  names=['qseqid', 'sseqid', 'PIdent', 'length', 'mismatch', 'gapopen', 
+	df_blast_iter = pd.read_csv(blast_all_vs_all, sep = "\t",  names=['qseqid', 'sseqid', 'PIdent', 'length', 'mismatch', 'gapopen', 
 																'Qlen','qstart', 'qend', 'Slen', 'sstart', 'send', 'evalue', 'bitscore'], 
 								chunksize=100000)
 
@@ -66,7 +66,7 @@ if __name__ == '__main__':
 	edge_attributes = ['Type', 'Qcov', 'Scov', 'qstart', 'qend', 'sstart', 'send']
 	for e in edge_attributes:
 		d = dict(zip(edge_list, df_filtered[e].tolist()))
-		nx.set_edge_attributes(G, d_edgetype, name=e.lower())
+		nx.set_edge_attributes(G, d, name=e.lower())
 
 	conn = list(nx.weakly_connected_components(G))
 	containment_clusters = []
@@ -98,7 +98,7 @@ if __name__ == '__main__':
 
 	for g in representative_contigs:
 		o.write('>'+g+'\n')
-		o.write('>'+d_novel_contigs[g]+'\n')
+		o.write(d_novel_contigs[g]+'\n')
 	o.close()
 
 	df_containment_clusters.to_csv(output_directory+'containment_clusters.txt', sep = "\t")

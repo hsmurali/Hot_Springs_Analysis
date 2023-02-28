@@ -10,7 +10,7 @@ if __name__ == '__main__':
     requiredNamed.add_argument("-o", "--output_directory", help = "Location to write oputputs to.", required = True)
 
     args = parser.parse_args()
-    assembly_directory = args.assembly_directories
+    assembly_directories = args.assembly_directories
     genomes = args.genomes
     output = args.output_directory
 
@@ -25,7 +25,7 @@ if __name__ == '__main__':
         for s in samples:
             if s.startswith('Hot'):
                 assembly = assembly_directories[i] +'/'+s+'/Megahit_Contigs/final.contigs.fa'
-                ref_scaffolds = assembly_directories[i] +'/'+s+'/reference_guided_scaffolds/Ref_Guided_Scaffolds'+genomes[i]+'.txt'
+                ref_scaffolds = assembly_directories[i] +'/'+s+'/reference_guided_scaffolds/Ref_Guided_Scaffolds.'+genomes[i]+'.txt'
                 s = s.replace(".txt","")
                 d = Load_Contigs(assembly, s, genomes[i])
                 contigs.update(d)
