@@ -1,3 +1,4 @@
+import re
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -100,6 +101,37 @@ def Merge_Paired_Ends(df_all):
     df['MisMatches_Total'] = df.apply(Count_MisMatches_Paired_End, args=(2000,), axis = 1)
     df = df.reset_index()
     return df
+
+def Parse_CS_String(CS, reference):
+    splits = re.split('(\:|\+|\*|\-)', CS)[1:]
+    assert len(splits)%2 == 0, "Length assertion failed"
+    str_index = 0
+    out_string = ""
+    for i in range(0,len(splits),2):
+        spl_char = splits[i]
+        value = splits[i+1]
+        if spl_char == ':':#Matches
+            out_string += reference[str_index:str_index+int(value)]
+            str_index += int(value)
+        elif spl_char == '*':#replacement
+            assert reference[str_index] == value[0], print(reference[str_index], value[0])
+            out_string += value[1]
+            str_index += 1
+        elif spl_char == '+':#Insertion into reference
+            pass
+        elif spl_char == '-':#Deletion from reference
+            str_index += 1
+    assert len(out_string) == len(reference), print("Length mismatch")
+    return (out_string)
+
+def Generate_Alignment_Profile(seq):
+    o = {'A': np.zeros(len(seq)), 'C' : np.zeros(len(seq)), 'G' : np.zeros(len(seq)), 'T' : np.zeros(len(seq))}
+    for i in range(len(seq)):
+        try:
+            o[seq[i]][i] += 1
+        except KeyError:
+            pass
+    return o
 
 def Edit(S1, S2):
     M = np.zeros((len(S1)+1, len(S2)+1))
