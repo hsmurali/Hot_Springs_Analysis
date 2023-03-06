@@ -138,3 +138,9 @@ def Summarize_Group(group):
                       'OSA_Counts':osa_counts, 'OSB_Counts':osb_counts, 
                       'MS-Temperature-Gradient':sorted(list(set(MS))), 
                       'OS-Temperature-Gradient':sorted(list(set(OS)))})
+
+def Assign_Reference(sseqid, d_ref):
+    for d in d_ref:
+        if d in sseqid:
+            return d_ref[d]
+    return "NA"

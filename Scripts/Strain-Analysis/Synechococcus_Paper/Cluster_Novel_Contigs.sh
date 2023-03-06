@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH -J Cluster_Novel_Contigs.Chloracidobacterium_thermophilum_B # Job name
-#SBATCH -o Cluster_Novel_Contigs.Chloracidobacterium_thermophilum_B.o # Name of output file
-#SBATCH -e Cluster_Novel_Contigs.Chloracidobacterium_thermophilum_B.e # Name of error file
+#SBATCH -J Cluster_Novel_Contigs.Roseiflexus #Ï Job name
+#SBATCH -o Cluster_Novel_Contigs.Roseiflexus.o # Name of output file
+#SBATCH -e Cluster_Novel_Contigs.Roseiflexus.e # Name of error file
 #SBATCH --mail-user=hsmurali@terpmail.umd.edu # Email for job info
 #SBATCH --mail-type=ALL # Get email for begin, end, and fail
 #SBATCH --nodes=1
@@ -18,7 +18,7 @@ export LD_LIBRARY_PATH="/fs/cbcb-software/RedHat-7-x86_64/common/local/sqlite/3.
 
 source activate /fs/cbcb-software/RedHat-7-x86_64/users/hsmurali/venvs/hotsprings_utils/
 
-genome=Chloracidobacterium_thermophilum_B
+genome=Roseiflexus
 data_dir=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Hotsprings_Variant_Structure/${genome}/
 output_dir=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Hotsprings_Variant_Structure_Data_Analysis/
 mkdir ${output_dir}
@@ -43,7 +43,7 @@ python ${srcdir}Cluster_Novel_Contigs.py -a ${output_dir}${genome}/Novel_Contigs
 										 -O ${output_dir}${genome}/ -s ${output_dir}${genome}/Novel_Contigs.fna \
 										 -c 90 -n 5 -r 75 -l 500
 
-REFPTH=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/Ref_Genomes_Not_Syn/Chloracidobacterium_thermophilum_B.fna
+REFPTH=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/Ref_Genomes_Not_Syn/Roseiflexus.fna
 makeblastdb -dbtype nucl \
 			-input_type fasta \
 			-in ${REFPTH} \
@@ -74,7 +74,9 @@ emapper.py -m no_search \
            --cpu 24 \
            --data_dir ${eggnog_db_path} --dbmem
 
-python ${srcdir}Post_Process_EggNOG_Annotations.py ${output_dir}${genome}/EggNOG/Representatives.eggnog.out.emapper.annotations \
-                                                   ${output_dir}${genome}/containment_clusters.txt \
-                                                   ${output_dir}${genome}/Representatives.${genome}.blast \
-                                                   ${output_dir}${genome}/EggNOG.Annotation.xlsx
+map_dir=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/Ref_Genomes_Not_Syn/Roseiflexus_Contigs.txt
+python ${srcdir}Post_Process_EggNOG_Annotations.py -g ${output_dir}${genome}/EggNOG/Representatives.eggnog.out.emapper.annotations\
+												   -c ${output_dir}${genome}/containment_clusters.txt \
+                                                   -b ${output_dir}${genome}/Representatives.${genome}.blast \
+                                                   -m ${map_dir} -r ${output_dir}${genome}/Representatives.fasta \
+                                                   -o ${output_dir}${genome}/
