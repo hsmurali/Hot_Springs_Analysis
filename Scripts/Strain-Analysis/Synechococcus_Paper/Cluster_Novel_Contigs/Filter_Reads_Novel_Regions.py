@@ -26,18 +26,13 @@ def Avg_Depth_of_Coverage(group):
     return cov.mean()
 
 def Load_PAF(filepath):
-    lines = open(filepath).readlines()
-    header = ['Query','Qlen','QStart','QEnd','Orientation','Subject','SLen',
-              'SStart','SEnd','Matches','AlignLength','MAPQ']
-    op = []
-    for l in lines:
-        l = l.split('\t')[:12]
-        op.append(dict(zip(header, l)))
-    df = pd.DataFrame(op)
-    df[['Qlen','QStart','QEnd','SLen','SStart',
-        'SEnd','Matches','AlignLength','MAPQ']] = df[['Qlen','QStart','QEnd','SLen','SStart',
+    header = ['Query','QLen','QStart','QEnd','Orientation','Subject','SLen','SStart','SEnd',
+              'Matches','AlignLength','MAPQ','TP', 'MM', 'GN', 'GO', 'CG', 'CS']
+    df = pd.read_csv(filepath, sep = "\t", names = header, compression = 'infer')
+    df[['QLen','QStart','QEnd','SLen','SStart',
+        'SEnd','Matches','AlignLength','MAPQ']] = df[['QLen','QStart','QEnd','SLen','SStart',
                                                       'SEnd','Matches','AlignLength','MAPQ']].astype('int')
-    df['PIdent'] = df['Matches']/df['Qlen']*100
+    df['PIdent'] = df['Matches']/df['QLen']*100
     df = df.loc[df.groupby(['Query'])['PIdent'].idxmax()]
     return df
 
@@ -51,6 +46,8 @@ sample = f.replace("_FD_"+ref+".paf","")
 
 df = Load_PAF(data_path)
 df = df[df['PIdent'] >= filter_score]
+
+print(df)
 
 df_grouped = df.groupby(['Subject'])
 

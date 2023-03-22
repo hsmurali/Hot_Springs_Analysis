@@ -19,7 +19,7 @@ source activate /fs/cbcb-software/RedHat-7-x86_64/users/hsmurali/venvs/hotspring
 genome=${1}
 WRKPTH=/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/
 READS_DIR=${WRKPTH}Data/YNP_Hot_Springs/Reads_Reformatted/
-NOVEL_CONTIGS=${WRKPTH}/Hotsprings_Variant_Structure_Data_Analysis/${genome}/Representatives.fasta
+NOVEL_CONTIGS=${WRKPTH}/Hotsprings_Variant_Structure_Data_Analysis/${genome}/Representatives.filtered.fa
 OUTDIR=${WRKPTH}/Hotsprings_Variant_Structure_Data_Analysis/${genome}/Read_alignments_novel_contigs/
 mkdir ${OUTDIR}
 
@@ -29,8 +29,9 @@ sample=`head -n ${SLURM_ARRAY_TASK_ID} hotspring_samples.txt | tail -n 1`
 reads_1=${READS_DIR}${sample}/${sample}_R1.fq.gz
 reads_2=${READS_DIR}${sample}/${sample}_R2.fq.gz
 minimap2 -t 8 ${NOVEL_CONTIGS} ${reads_1} ${reads_2} > ${OUTDIR}${sample}.paf
+gzip ${OUTDIR}${sample}.paf
 
 mkdir ${OUTDIR}Summarized_Coverages/
-prog_dir=/fs/cbcb-scratch/hsmurali/Hot_Springs_Analysis/Scripts/Strain-Analysis/Synechococcus_Paper/Cluster_Novel_Segments_Across_Samples/\
+prog_dir=/fs/cbcb-scratch/hsmurali/Hot_Springs_Analysis/Scripts/Strain-Analysis/Synechococcus_Paper/Cluster_Novel_Contigs/\
 Filter_Reads_Novel_Regions.py 
-python ${prog_dir} ${OUTDIR}${sample}.paf 95.0 ${OUTDIR}Summarized_Coverages/${sample}.txt
+python ${prog_dir} ${OUTDIR}${sample}.paf.gz 95.0 ${OUTDIR}Summarized_Coverages/${sample}.txt
