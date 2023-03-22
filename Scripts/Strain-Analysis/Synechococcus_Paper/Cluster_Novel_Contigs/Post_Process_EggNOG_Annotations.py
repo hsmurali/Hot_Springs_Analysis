@@ -1,51 +1,70 @@
 import sys
+import argparse as ap
 from Cluster_Containments_Utils import *
 
-eggnog_path = sys.argv[1]
-containment = sys.argv[2]
-synechococcus_blast = sys.argv[3]
-output = sys.argv[4]
+if __name__ == '__main__':
+	parser = ap.ArgumentParser(description="Identify Novel Groups and Post process EggNOG Annotations.")
+	requiredNamed = parser.add_argument_group('required named arguments')
+	optionalNamed = parser.add_argument_group('optional named arguments')
 
-df_containment = pd.read_csv(containment, sep = "\t")
-df_containment_grp = df_containment.groupby('GroupID').apply(Summarize_Group)
-df_containment_grp = df_containment_grp.reset_index()
+	requiredNamed.add_argument("-g", "--eggnog_annotations", help="Path to a file containing EggNOG annotations.", required=True)
+	requiredNamed.add_argument("-c", "--clusters", help="Path to a file describing the clusters.", required=True)
+	requiredNamed.add_argument("-b", "--blast_hits", help="Output of running blast against the genome and the representatives.", required=True)
+	requiredNamed.add_argument("-m", "--map", help="Text file describing the contig ids and the genomes they are found in.", required=True)
+	requiredNamed.add_argument("-r", "--representatives", help="A fasta file of the representatives", required=True)
+	requiredNamed.add_argument("-o", "--output_directory", help="Output directory", required=True)
 
-df_eggnog = pd.read_csv(eggnog_path, sep = "\t")
-df_eggnog = df_eggnog[['#query','seed_ortholog','evalue','score','max_annot_lvl',
-                       'COG_category','Description','Preferred_name']]
-df_eggnog['Notes by Devaki'] = ""
-df_eggnog['RepresentativeContig'] = df_eggnog['#query'].apply(get_Query_ID)
-df_eggnog = df_eggnog.merge(df_containment_grp, on = 'RepresentativeContig', how = 'right')
-df_eggnog = df_eggnog.reset_index()
+	optionalNamed.add_argument("-t", "--threshold", help="threshold to identify novel contigs", required=False, default = "60")
 
-df_blast = pd.read_csv(synechococcus_blast, sep = "\t",names=['qseqid', 'sseqid', 'pident', 'length', 'mismatch', 
-                                                              'gapopen', 'qlen', 'qstart', 'qend', 'slen', 
-                                                              'sstart', 'send', 'evalue', 'bitscore'])
+	args = parser.parse_args()
 
-df_blast['sseqid'] = df_blast['sseqid'].replace("gi|86604733|ref|NC_007775.1|","OSA")
-df_blast['sseqid'] = df_blast['sseqid'].replace("gi|86607503|ref|NC_007776.1|","OSB")
-df_blast['sseqid'] = df_blast['sseqid'].replace("NC_016024.1","Chloracidobacterium")
-df_blast['sseqid'] = df_blast['sseqid'].replace("KI911784.1","Chloroflexus")
-df_blast['sseqid'] = df_blast['sseqid'].replace("NC_009523.1","Roseiflexus")
+	eggnog_path = args.eggnog_annotations
+	containment = args.clusters
+	genome_blast = args.blast_hits
+	Contig_Map = args.map
+	representatives_path = args.representatives
+	filter_for_novel = float(args.threshold)
+	output_directory = args.output_directory
 
-grouped = df_blast.groupby(['qseqid','sseqid'])
+	df_containment = pd.read_csv(containment, sep = "\t")	
+	df_containment_grp = df_containment.groupby('GroupID').apply(Summarize_Group)
+	df_containment_grp = df_containment_grp.reset_index()
 
-df_blast_grouped = pd.DataFrame()
-df_blast_grouped['QCov'] = grouped.apply(Compute_Query_Coverage)
-df_blast_grouped = df_blast_grouped.reset_index()
-df_blast_grouped = df_blast_grouped.pivot(index = ['qseqid'], columns=['sseqid'], values=['QCov'])
-df_blast_grouped.columns = df_blast_grouped.columns.droplevel()
-df_blast_grouped = df_blast_grouped.reset_index()
-df_blast_grouped = df_blast_grouped.reset_index().rename(columns = {'qseqid':'RepresentativeContig'})
-df_blast_grouped = df_blast_grouped.set_index('RepresentativeContig')
-del df_blast_grouped['index']
-df_blast_grouped = df_blast_grouped.rename(columns={'OSA':'OSA_Cov', 'OSB':'OSB_Cov',
-                                                    'Chloracidobacterium':'Chloracidobacterium_Cov',
-                                                    'Chloroflexus':'Chloroflexus_Cov',
-                                                    'Roseiflexus':'Roseiflexus_Cov'})
+	df_eggnog = pd.read_csv(eggnog_path, sep = "\t")
+	df_eggnog = df_eggnog[['#query','seed_ortholog','evalue','score','max_annot_lvl', 'COG_category','Description','Preferred_name']]
+	df_eggnog['Notes by Devaki'] = ""
+	df_eggnog['RepresentativeContig'] = df_eggnog['#query'].apply(get_Query_ID)
+	df_eggnog = df_eggnog.merge(df_containment_grp, on = 'RepresentativeContig', how = 'right').reset_index()
 
-df_eggnog = df_eggnog.merge(df_blast_grouped, on = 'RepresentativeContig', how = 'left')
-del df_eggnog['index']
-df_eggnog = df_eggnog.set_index('GroupID')
+	df_blast = pd.read_csv(genome_blast, sep = "\t",
+						   names=['qseqid', 'sseqid', 'pident', 'length', 'mismatch','gapopen', 'qlen', 'qstart', 
+								  'qend', 'slen', 'sstart', 'send', 'evalue', 'bitscore'])
+	df_contigs = pd.read_csv(Contig_Map, sep = "\t", names = ['sseqid', 'Genome'])
+	d = dict(zip(df_contigs['sseqid'].tolist(), df_contigs['Genome'].tolist()))
+	df_blast['Genome'] = df_blast['sseqid'].apply(Assign_Reference, d_ref = d)
 
-df_eggnog.to_excel(output)
+	grouped = df_blast.groupby(['qseqid','Genome'])
+
+	df_blast_grouped = pd.DataFrame()
+	df_blast_grouped['QCov'] = grouped.apply(Compute_Query_Coverage)
+	df_blast_grouped = df_blast_grouped.reset_index()
+	df_blast_grouped = df_blast_grouped[df_blast_grouped['QCov'] < filter_for_novel]
+	df_blast_grouped = df_blast_grouped.pivot(index = ['qseqid'], columns=['Genome'], values=['QCov'])
+	df_blast_grouped.columns = df_blast_grouped.columns.droplevel()
+	df_blast_grouped = df_blast_grouped.reset_index()
+	df_blast_grouped = df_blast_grouped.reset_index().rename(columns = {'qseqid':'RepresentativeContig'})
+	df_blast_grouped = df_blast_grouped.set_index('RepresentativeContig')
+	del df_blast_grouped['index']
+	df_eggnog = df_eggnog.merge(df_blast_grouped, on = 'RepresentativeContig', how = 'right')
+	df_eggnog = df_eggnog.set_index('GroupID')
+
+	representatives = Load_Contigs(representatives_path)
+	filtered_representatives = df_eggnog['RepresentativeContig'].unique()
+
+	o = open(output_directory+'/Representatives.filtered.fa','w')
+	for f in filtered_representatives:
+		o.write('>'+f+'\n')
+		o.write('>'+representatives[f]+'\n')
+	o.close()
+
+	df_eggnog.to_excel(output_directory+'/Filtered.Eggnog.Annotations.xlsx')

@@ -25,27 +25,26 @@ srcdir=/fs/cbcb-scratch/hsmurali/Hot_Springs_Analysis/Scripts/Strain-Analysis/Sy
 
 mkdir ${output_dir}
 
-cat ${data_path}OSA/Novel_Contigs_All_vs_All.txt \
-	${data_path}OSB/Novel_Contigs_All_vs_All.txt > ${output_dir}Novel_Contigs_All_vs_All.txt
+cat ${data_path}OSA/Novel_Contigs.fna ${data_path}OSB/Novel_Contigs.fna > ${output_dir}Novel_Contigs.fna
+cat ${REFPTH}/Synechococcus_OS-A_genome.fasta ${REFPTH}/Synechococcus_OS-B_genome.fasta > ${output_dir}References.fasta
+cat ${REFPTH}/Synechococcus_OS-A_Contigs.txt ${REFPTH}/Synechococcus_OS-B_Contigs.txt > ${output_dir}References_Counts.txt
 
-cat ${data_path}OSA/Novel_Contigs.fna \
-	${data_path}OSB/Novel_Contigs.fna > ${output_dir}Novel_Contigs.fna
+makeblastdb -dbtype nucl -in ${output_dir}Novel_Contigs.fna \
+			-input_type fasta -parse_seqids -out ${output_dir}Novel_Contigs.db
 
-cat ${REFPTH}/Synechococcus_OS-A_genome.fasta \
-	${REFPTH}/Synechococcus_OS-B_genome.fasta > ${output_dir}References.fasta
+blastn -db ${output_dir}Novel_Contigs.db -query ${output_dir}Novel_Contigs.fna \
+	   -out ${output_dir}Novel_Contigs_All_vs_All.txt -num_threads 24 \
+       -outfmt "6 qseqid sseqid pident length mismatch gapopen qlen qstart qend slen sstart send evalue bitscore" 
 
 python ${srcdir}Cluster_Novel_Contigs.py -a ${output_dir}Novel_Contigs_All_vs_All.txt \
 										 -O ${output_dir} -s ${output_dir}Novel_Contigs.fna \
 										 -c 90 -n 5 -r 75 -l 500
 
-makeblastdb -dbtype nucl \
-			-input_type fasta \
+makeblastdb -dbtype nucl -input_type fasta \
 			-in ${output_dir}References.fasta \
-			-parse_seqids \
-			-out ${output_dir}References.db
+			-parse_seqids -out ${output_dir}References.db
 
-blastn -db ${output_dir}References.db \
-	   -query ${output_dir}Representatives.fasta \
+blastn -db ${output_dir}References.db -query ${output_dir}Representatives.fasta \
        -out ${output_dir}Representatives.blast \
        -outfmt "6 qseqid sseqid pident length mismatch gapopen qlen qstart qend slen sstart send evalue bitscore"
 
@@ -69,7 +68,9 @@ emapper.py -m no_search \
            --cpu 24 \
            --data_dir ${eggnog_db_path} --dbmem
 
-python ${srcdir}Post_Process_EggNOG_Annotations.py ${output_dir}/EggNOG/Representatives.eggnog.out.emapper.annotations \
-                                                   ${output_dir}/containment_clusters.txt \
-                                                   ${output_dir}/Representatives.blast \
-                                                   ${output_dir}/EggNOG.Annotation.xlsx
+python ${srcdir}Post_Process_EggNOG_Annotations.py -g ${output_dir}/EggNOG/Representatives.eggnog.out.emapper.annotations\
+												   -c ${output_dir}/containment_clusters.txt \
+                                                   -b ${output_dir}/Representatives.blast \
+                                                   -m ${output_dir}/References_Counts.txt \
+                                                   -r ${output_dir}/Representatives.fasta \
+                                                   -o ${output_dir}/
