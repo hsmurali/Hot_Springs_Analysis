@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from Bio import SeqIO
+from copy import deepcopy
 from functools import partial
 from os import listdir, mkdir
 
@@ -19,7 +21,10 @@ def Load_PAF(filepath, sample):
     df['Sample'] = sample.replace("_FD.paf","")
     df['S_Align'] = df['SEnd'] - df['SStart']
     df = df[(df['QLen'] == df['AlignLength'])]
-
+    df = df[df['QLen'] > 120]
+    
+    print(len(df[df['QLen'] == 150]), len(df))
+    
     df['Read_Name'] = df['Query'].str[0:-2]
     df['Read_Tag'] = df['Query'].str[-1]
     df['MisMatches'] = df['AlignLength']-df['Matches']
@@ -120,7 +125,8 @@ def Parse_CS_String(CS, reference):
         elif spl_char == '+':#Insertion into reference
             pass
         elif spl_char == '-':#Deletion from reference
-            str_index += 1
+            out_string += '-'*len(value)
+            str_index += len(value)
     assert len(out_string) == len(reference), print("Length mismatch")
     return (out_string)
 
@@ -132,21 +138,6 @@ def Generate_Alignment_Profile(seq):
         except KeyError:
             pass
     return o
-
-def Edit(S1, S2):
-    M = np.zeros((len(S1)+1, len(S2)+1))
-    for i in range(len(S1)+1):
-        M[i][0] = 1*i
-    for j in range(0, len(S2)+1):
-        M[0][j] = 1*j
-    
-    for i in range(1, len(S1)+1):
-        for j in range(1, len(S2)+1):
-            if S1[i-1] == S2[j-1]:
-                M[i][j] = M[i-1][j-1]
-            else:
-                M[i][j] = min(M[i-1][j-1]+1, M[i][j-1]+1, M[i-1][j]+1)
-    return M[-1][-1]
 
 def Plot_Divergence(df, ax, genomes, xlabel, ylabel, x_twin_label, legend, legend_list, 
                     x = 'MisMatches', y = 'Num_Reads', x_twin = 'Divergence', read_length = 150, 
@@ -201,3 +192,14 @@ def Plot_Divergence_Samplewise(df, axlist, genomes, samples, xlabel, ylabel, x_t
     if legend:
         axlist[-1].legend(legend_list, ncol = 2)
     return axlist
+
+def Load_Fasta_Seqs(seq_path, MSA_Encoding = False):
+    d = {}
+    fasta_sequences = SeqIO.parse(open(seq_path),'fasta')
+    for s in fasta_sequences:
+        seq = str(s.seq)
+        if MSA_Encoding == True:
+            seq = seq.replace("A","0").replace("C","1").replace("G","2").replace("T","3").replace("-","4").replace("N","5")
+            seq = np.array(list(seq), dtype = int)
+        d[s.name] = seq
+    return d
