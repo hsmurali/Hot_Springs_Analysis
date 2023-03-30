@@ -9,11 +9,13 @@ from functools import partial
 from os import listdir, mkdir
 
 
-def Load_PAF(filepath, sample):
+def Load_PAF(filepath, sample, flip = False):
     header = ['Query','QLen','QStart','QEnd','Orientation','Subject','SLen','SStart','SEnd',
               'Matches','AlignLength','MAPQ','TP', 'MM', 'GN', 'GO', 'CG', 'CS']
+    if(flip):
+        header = ['Subject','SLen','SStart','SEnd','Orientation','Query','QLen','QStart','QEnd',
+                  'Matches','AlignLength','MAPQ','TP', 'MM', 'GN', 'GO', 'CG', 'CS']
     df = pd.read_csv(filepath, sep = "\t", names = header)
-    
     df[['QLen','QStart','QEnd','SLen','SStart',
         'SEnd','Matches','AlignLength','MAPQ']] = df[['QLen','QStart','QEnd','SLen','SStart',
                                                       'SEnd','Matches','AlignLength','MAPQ']].astype('int')
@@ -21,7 +23,7 @@ def Load_PAF(filepath, sample):
     df['Sample'] = sample.replace("_FD.paf","")
     df['S_Align'] = df['SEnd'] - df['SStart']
     df = df[(df['QLen'] == df['AlignLength'])]
-    df = df[df['QLen'] > 120]
+    #df = df[df['QLen'] > 120]
     
     print(len(df[df['QLen'] == 150]), len(df))
     

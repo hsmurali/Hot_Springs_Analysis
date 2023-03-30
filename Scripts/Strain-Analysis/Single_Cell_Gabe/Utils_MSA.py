@@ -161,3 +161,11 @@ def Perform_Clustering(d_MSA):
     Dist_MAT = Dist_MAT[:, leaves]
     Dist_MAT = Dist_MAT[leaves,:]    
     return Dist_MAT, s
+
+def Sub_Sample(Mat, freq, rate = 10000):
+    frequencies = np.array(freq)
+    frequencies = np.ceil(frequencies/frequencies.sum()*rate).astype(int)
+    S = np.repeat(Mat, frequencies, axis = 0)
+    S = S.T
+    S = np.repeat(S, frequencies, axis = 0)
+    return S, frequencies
