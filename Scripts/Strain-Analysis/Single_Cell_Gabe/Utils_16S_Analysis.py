@@ -9,25 +9,28 @@ from functools import partial
 from os import listdir, mkdir
 
 
-def Load_PAF(filepath, sample):
+def Load_PAF(filepath, sample, flip = False):
     header = ['Query','QLen','QStart','QEnd','Orientation','Subject','SLen','SStart','SEnd',
               'Matches','AlignLength','MAPQ','TP', 'MM', 'GN', 'GO', 'CG', 'CS']
+    if(flip):
+        header = ['Subject','SLen','SStart','SEnd','Orientation','Query','QLen','QStart','QEnd',
+                  'Matches','AlignLength','MAPQ','TP', 'MM', 'GN', 'GO', 'CG', 'CS']
     df = pd.read_csv(filepath, sep = "\t", names = header)
-    
     df[['QLen','QStart','QEnd','SLen','SStart',
         'SEnd','Matches','AlignLength','MAPQ']] = df[['QLen','QStart','QEnd','SLen','SStart',
                                                       'SEnd','Matches','AlignLength','MAPQ']].astype('int')
     df['PIdent'] = df['Matches']/df['AlignLength']*100.0
     df['Sample'] = sample.replace("_FD.paf","")
     df['S_Align'] = df['SEnd'] - df['SStart']
-    df = df[(df['QLen'] == df['AlignLength'])]
-    df = df[df['QLen'] > 120]
+    df = df[(df['QLen'] <= df['AlignLength'])]
+    df = df[df['QLen'] == 150]
     
-    print(len(df[df['QLen'] == 150]), len(df))
+    print(len(df[df['QLen'] < df['AlignLength']]), len(df))
     
     df['Read_Name'] = df['Query'].str[0:-2]
     df['Read_Tag'] = df['Query'].str[-1]
-    df['MisMatches'] = df['AlignLength']-df['Matches']
+    df['MisMatches'] = df['QLen']-df['Matches']
+    df['Gaps'] = df['QLen'] - df['MisMatches']
     df['Read_ID'] = df['Sample']+"_"+df['Query']
     
     return df
@@ -45,7 +48,7 @@ def Coverage_Stats(group, slen, pe = False, length = 1300):
     for i in range(0, len(Sstarts)):
         start, end = Sstarts[i], Sends[i]
         coverage[start:end] += 1
-    length = len(coverage)
+    
     avg_depth = coverage.sum()/length
     breadth = len(coverage[coverage > 0])/length*100.0
     num_reads = len(group)
@@ -145,19 +148,17 @@ def Plot_Divergence(df, ax, genomes, xlabel, ylabel, x_twin_label, legend, legen
     twin_axis = ax.twiny()
     for i in range(len(genomes)):
         df.loc[genomes[i]].plot(x, y, color = colors[i], marker = 'o', ms = ms, ax = ax, 
-                                linestyle = '--', legend = False,linewidth = lw)
-        df.loc[genomes[i]].plot(x_twin, y, color = colors[i], marker = 'o', ms = ms, ax = twin_axis, 
-                                linestyle = '--', legend = False,linewidth = lw)
+                                legend = False,linewidth = lw)
     ax.set_yscale('log')
     ax.set_ylabel(ylabel)
-    if(legend): ax.legend(legend_list, ncol=1)
-
-    ax.set_xlim([twin_axis.get_xlim()[0]*read_length/100 , twin_axis.get_xlim()[1]*read_length/100])
+    if(legend): ax.legend(legend_list, ncol=1, frameon = False, loc = 1, handlelength = 1, 
+                          fontsize = 8, bbox_to_anchor = (1.02,0.85))
+    ax.set_xlim(-2, 24)
+    twin_axis.set_xlim([ax.get_xlim()[0]/read_length*100 , ax.get_xlim()[1]/read_length*100])
     for i in range(0, int(twin_axis.get_xlim()[1])):
-        twin_axis.axvline(i, linestyle = ':', color = 'grey', linewidth = 0.5)
+        twin_axis.axvline(i, linestyle = ':', color = 'grey', linewidth = 0.0)
     twin_axis.set_xticks(np.arange(0,int(twin_axis.get_xlim()[1])+1,2))
     twin_axis.set_xlabel(x_twin_label)
-    ax.yaxis.grid()
     ax.set_xlabel(xlabel)
     return ax
 
