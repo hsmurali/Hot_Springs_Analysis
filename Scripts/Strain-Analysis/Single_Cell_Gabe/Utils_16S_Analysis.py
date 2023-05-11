@@ -144,7 +144,7 @@ def Generate_Alignment_Profile(seq):
 
 def Plot_Divergence(df, ax, genomes, xlabel, ylabel, x_twin_label, legend, legend_list, 
                     x = 'MisMatches', y = 'Num_Reads', x_twin = 'Divergence', read_length = 150, 
-                    colors = ['C0','C1','C2','C5'], lw=1, ms=7.5):
+                    colors = ['C0','C1','C2','C5'], lw=1, ms=7.5, legend_fontsize = 7.5):
     twin_axis = ax.twiny()
     for i in range(len(genomes)):
         df.loc[genomes[i]].plot(x, y, color = colors[i], marker = 'o', ms = ms, ax = ax, 
@@ -152,16 +152,19 @@ def Plot_Divergence(df, ax, genomes, xlabel, ylabel, x_twin_label, legend, legen
     ax.set_yscale('log')
     ax.set_ylabel(ylabel)
     if(legend): ax.legend(legend_list, ncol=1, frameon = False, loc = 1, handlelength = 1, 
-                          fontsize = 8, bbox_to_anchor = (1.02,0.85))
+                           fontsize = legend_fontsize, bbox_to_anchor = (1.02,0.85))
+    ax.set_xticks(range(0, 28, 4))
     ax.set_xlim(-2, 24)
     twin_axis.set_xlim([ax.get_xlim()[0]/read_length*100 , ax.get_xlim()[1]/read_length*100])
     for i in range(0, int(twin_axis.get_xlim()[1])):
         twin_axis.axvline(i, linestyle = ':', color = 'grey', linewidth = 0.0)
-    twin_axis.set_xticks(np.arange(0,int(twin_axis.get_xlim()[1])+1,2))
+    twin_axis.set_xticks(np.arange(0,int(twin_axis.get_xlim()[1])+1,4))
     twin_axis.set_xlabel(x_twin_label)
     ax.set_xlabel(xlabel)
-    return ax
+    ax.tick_params(axis='both', labelsize=10)
+    twin_axis.tick_params(axis='both', labelsize=10)
 
+    return ax
 def Plot_Divergence_Samplewise(df, axlist, genomes, samples, xlabel, ylabel, x_twin_label, legend, legend_list, 
                                x = 'MisMatches', y = 'Num_Reads', x_twin = 'Divergence', read_length = 150, 
                                colors = ['C0','C1','C2','C5'], color_by_sample = False):

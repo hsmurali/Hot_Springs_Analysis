@@ -30,8 +30,11 @@ def Get_Cumulative_Counts(grp):
     grp['Rev_Cumulative'] = 1-grp['Normalized_Counts']
     return grp
 
-def Summarize(df, columns, index):
-    df_grouped = df.groupby(columns+['mismatch','Divergence']).count()[['qseqid']]
+def Summarize(df, columns, index, agg = 'sum'):
+    if agg == 'sum':
+        df_grouped = df.groupby(columns+['mismatch','Divergence']).sum()[['qseqid']]
+    else:
+        df_grouped = df.groupby(columns+['mismatch','Divergence']).count()[['qseqid']]
     df_grouped = df_grouped.reset_index()
     df_grp = df_grouped.groupby(columns).apply(Get_Cumulative_Counts)
     df_grp = df_grp.set_index(index)
