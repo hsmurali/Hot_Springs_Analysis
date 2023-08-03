@@ -48,9 +48,13 @@ if __name__ == '__main__':
 	df_blast_grouped = pd.DataFrame()
 	df_blast_grouped['QCov'] = grouped.apply(Compute_Query_Coverage)
 	df_blast_grouped = df_blast_grouped.reset_index()
-	df_blast_grouped = df_blast_grouped[df_blast_grouped['QCov'] < filter_for_novel]
+	
 	df_blast_grouped = df_blast_grouped.pivot(index = ['qseqid'], columns=['Genome'], values=['QCov'])
+	df_blast_grouped = df_blast_grouped.fillna(0)
 	df_blast_grouped.columns = df_blast_grouped.columns.droplevel()
+	df_blast_grouped = df_blast_grouped[(df_blast_grouped < filter_for_novel)].dropna()
+
+
 	df_blast_grouped = df_blast_grouped.reset_index()
 	df_blast_grouped = df_blast_grouped.reset_index().rename(columns = {'qseqid':'RepresentativeContig'})
 	df_blast_grouped = df_blast_grouped.set_index('RepresentativeContig')

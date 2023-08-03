@@ -103,8 +103,12 @@ def Compute_Query_Coverage(group):
     starts, ends = group['qstart'].tolist(), group['qend'].tolist()
     length = group.iloc[0]['qlen']
     presence = np.zeros(length)
+
     for i in range(len(starts)):
         presence[starts[i]:ends[i]] = 1
+    
+    if length == 729:
+        print(group['qseqid'].unique(), group['Genome'].unique(), length, np.sum(presence)/len(presence)*100)
     return np.sum(presence)/len(presence)*100
 
 def Average_PIdent(group):
