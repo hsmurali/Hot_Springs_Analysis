@@ -1,0 +1,8 @@
+{
+    "reads_dir":"/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/Reads_Reformatted/",
+    "genome_file_path":"/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/Ref_Genomes_Not_Syn/Synechococcus_OS-A_genome.fasta",
+    "indx_path":"/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/Ref_Genomes_Not_Syn/Synechococcus_OS-A",
+    "out_dir":"/fs/cbcb-scratch/hsmurali/Test_Snakemake/",
+    "threads":"32",
+    "genome":"OSA"
+}

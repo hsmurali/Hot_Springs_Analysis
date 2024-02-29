@@ -39,7 +39,7 @@ if __name__ == '__main__':
 	df_blast = pd.read_csv(genome_blast, sep = "\t",
 						   names=['qseqid', 'sseqid', 'pident', 'length', 'mismatch','gapopen', 'qlen', 'qstart', 
 								  'qend', 'slen', 'sstart', 'send', 'evalue', 'bitscore'])
-	df_contigs = pd.read_csv(Contig_Map, sep = "\t", names = ['sseqid', 'Genome'])
+	df_contigs = pd.read_csv(Contig_Map, sep = " ", names = ['sseqid', 'Genome'])
 	d = dict(zip(df_contigs['sseqid'].tolist(), df_contigs['Genome'].tolist()))
 	df_blast['Genome'] = df_blast['sseqid'].apply(Assign_Reference, d_ref = d)
 
@@ -68,7 +68,7 @@ if __name__ == '__main__':
 	o = open(output_directory+'/Representatives.filtered.fa','w')
 	for f in filtered_representatives:
 		o.write('>'+f+'\n')
-		o.write('>'+representatives[f]+'\n')
+		o.write(representatives[f]+'\n')
 	o.close()
 
 	df_eggnog.to_excel(output_directory+'/Filtered.Eggnog.Annotations.xlsx')

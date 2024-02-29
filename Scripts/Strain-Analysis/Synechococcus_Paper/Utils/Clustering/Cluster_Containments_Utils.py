@@ -13,7 +13,8 @@ def Load_Contigs(contigs_path, sample="", genome=""):
         if genome == "" and sample == "":
             d[s.name] = str(s.seq)
         else:
-            d[sample+'_'+genome+'_'+s.name] = str(s.seq)
+            contig_id = sample+'_'+genome+'_'+s.name
+            d[contig_id] = str(s.seq)
     return d
 
 def Load_and_Filter_Contigs(contig_path, sample, genome, length_filter = 500):

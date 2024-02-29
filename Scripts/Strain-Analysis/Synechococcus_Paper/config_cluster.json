@@ -1,0 +1,33 @@
+{
+	"genome_id":"Chloroflexus_MS_G",
+	"Chloracidobacterium_thermophilum_B":{
+	"genome_list":["Chloracidobacterium_thermophilum_B"],
+	"Reference_Genomes":["/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/Ref_Genomes_Not_Syn/Chloracidobacterium_thermophilum_B.fna"],
+	"data_dir":["/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Hotsprings_Variant_Structure/Chloracidobacterium_thermophilum_B/"]},
+	"Roseiflexus":{
+	"genome_list":["Roseiflexus"],
+	"Reference_Genomes":["/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/Ref_Genomes_Not_Syn/Roseiflexus.fna"],
+	"data_dir":["/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Hotsprings_Variant_Structure/Roseiflexus/"]
+	},
+	"Aerophilum":{
+	"genome_list":["Aerophilum"],
+	"Reference_Genomes":["/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/Ref_Genomes_Not_Syn/Aerophilum.fna"],
+	"data_dir":["/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Hotsprings_Variant_Structure/Aerophilum/"]
+	},
+	"Synechococcus":{
+	"genome_list":["OSA","OSB"],
+	"Reference_Genomes":["/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/Ref_Genomes_Not_Syn/Synechococcus_OS-A_genome.fasta",
+		"/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/Ref_Genomes_Not_Syn/Synechococcus_OS-B_genome.fasta"],
+	"data_dir":["/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Hotsprings_Variant_Structure/OSA/",
+		"/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Hotsprings_Variant_Structure/OSB/"]
+	},
+	"Chloroflexus_MS_G":{
+	"genome_list":["Chloroflexus_MS_G"],
+	"Reference_Genomes":["/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/Ref_Genomes_Not_Syn/Chloroflexus_MS_G.fna"],
+	"data_dir":["/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Hotsprings_Variant_Structure/Chloroflexus_MS_G/"]
+	},
+	"output_dir":"/fs/cbcb-scratch/hsmurali/Hotsprings_Variant_Structure_Data_Analysis/",
+	"eggnog_db":"/fs/cbcb-lab/mpop/MetaCarvel_paper/hmp_scaffolds/eggnog_functional_comparison/databases/",
+	"threads":"32",
+	"reads_dir":"/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/Reads_Reformatted/"
+}

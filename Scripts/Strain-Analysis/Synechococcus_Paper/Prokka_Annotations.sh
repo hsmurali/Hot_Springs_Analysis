@@ -4,11 +4,11 @@
 #SBATCH -e Prokka_Metagenome.e%j # Name of Error File
 #SBATCH --time=24:00:00                                         
 #SBATCH --qos=high                                           
-#SBATCH --mem=32gb                                               
+#SBATCH --mem=128gb                                               
 #SBATCH --partition=cbcb 
 #SBATCH --account=cbcb 
 #SBATCH --ntasks=8
-#SBATCH --array=1-34%5
+#SBATCH --array=1-34%4
 #SBATCH --mail-user=hsmurali@terpmail.umd.edu # Email for job info
 #SBATCH --mail-type=ALL # Get email for begin, end, and fail
 
@@ -23,6 +23,7 @@ s=`head -n ${SLURM_ARRAY_TASK_ID} Hotsprings_${bug}.txt | tail -n 1`
 
 assembly=${data_dir}/${bug}/${s}/Megahit_Contigs/final.contigs.fa
 outdir=${data_dir}/${bug}/${s}/Prokka_Annotations/
+rm -rf ${outdir}
 
 prokka --outdir ${outdir} --metagenome ${assembly} 
 
