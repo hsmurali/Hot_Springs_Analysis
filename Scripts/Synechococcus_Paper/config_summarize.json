@@ -1,0 +1,8 @@
+{
+	"Reassembly_Dir":"/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Hotsprings_Variant_Structure/",
+	"Clustering_Dir":"/fs/cbcb-scratch/hsmurali/Hotsprings_Variant_Structure_Data_Analysis",
+	"reassembled_genomes":["OSA","OSB","Aerophilum","Chloracidobacterium_thermophilum_B","Chloroflexus_MS_G","Roseiflexus"],
+	"clustered_genomes":["Synechococcus","Aerophilum","Chloracidobacterium_thermophilum_B","Chloroflexus_MS_G","Roseiflexus"],
+	"SAGs":"/fs/cbcb-lab/mpop/hotspring_metagenome/Synechococcus_paper_analysis/Data/YNP_Hot_Springs/single_cell_assemblies/",
+	"opdir":"/fs/cbcb-scratch/hsmurali/Hotsprings_Variant_Structure_Data_Analysis/"
+}
