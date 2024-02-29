@@ -29,7 +29,9 @@ requiredNamed = parser.add_argument_group('required named arguments')
 requiredNamed.add_argument("-d", "--data_dir", help="Path to the directory containing the results of the Snakemake workflow Snakefile.Reassemble_Reads.smk", required=True)
 requiredNamed.add_argument("-g", "--genome", help="Genome id. The Genome id should be consistent across with the ids used for Snakefile.Reassemble_Reads.smk & Snakefile.Cluster.smk", 
 						   required=True)
-requiredNamed.add_argument("-l", "--length", help="Minimum length of the contgs used to perform scaffolding. (default = 500)", required = False, default = "500") 
+requiredNamed.add_argument("-l", "--length", help="Minimum length of the contgs used to perform scaffolding. (default = 500)", required = False, default = "500")
+requiredNamed.add_argument("-p", "--pident", help="PIdentity of Minjimap2 Alignments used for backbones. Should be consistent with the values used for Reference guided scaffolding(default = 70)", 
+						   required = False, default = "70") 
 requiredNamed.add_argument("-o", "--output", help="Path to the output file", required=True)
 
 args = parser.parse_args()
@@ -38,7 +40,7 @@ data_dir = args.data_dir
 genome = args.genome
 out_file = args.output
 length = int(args.length)
-
+pident = float(args.pident)
 if data_dir.endswith("/") == False:
 	data_dir +=  "/"
 
@@ -57,7 +59,7 @@ for sample in hotsprings:
 
 		df_novel_contigs = pd.read_csv(data_dir+sample+'/reference_guided_scaffolds/Ref_Guided_Scaffolds.'+genome+'.txt', sep = "\t")
 		novel_contigs = df_novel_contigs['Contig'].unique()
-		T = df_paf[df_paf['PIdent'] > 70]
+		T = df_paf[df_paf['PIdent'] > pident]
 		non_novel_contigs = T.index.unique()
 
 		df = df_read_counts.join(df_fai[['Length']], how = 'left')
@@ -68,7 +70,7 @@ for sample in hotsprings:
 		df.loc[non_novel_contigs, 'Novel'] = -1
 		
 		df = df.reset_index()
-		df['Sample'] = sample
+		df['Sample'] = sample.replace("_FD","")
 		df['Genome'] = genome
 		df_orphaned_reads = df_orphaned_reads.append(df, ignore_index = True)
 	except FileNotFoundError:

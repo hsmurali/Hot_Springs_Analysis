@@ -3,6 +3,7 @@ import pandas as pd
 import argparse as ap
 import pickle as pkl
 from os import listdir
+from subprocess import check_output
 
 def Parse_Diff_Read_Alignment_Summary(fp):
 	lines = open(fp).readlines()
@@ -32,6 +33,8 @@ def Summarize_Coverages(coverage_file, w = 1000):
 	glen = len(df)
 	return df.rolling(w).mean()[w-1::w], glen
 
+def line_count(filename):
+	return int(check_output(['wc', '-l', filename]).split()[0])
 
 parser = ap.ArgumentParser(description="Estimate Abundances of Filtered Representatives")
 requiredNamed = parser.add_argument_group('required named arguments')
@@ -62,9 +65,13 @@ for f in listdir(data_dir):
 		coverage_file = data_dir+f+'/Differential_Read_Counting/Genome.'+g+'.Coverage.gz'
 		summary_file = data_dir+f+'/Differential_Read_Counting/Genome.'+g+'.Summary'
 		faifile = data_dir+f+'/Megahit_Contigs/final.contigs.fa.fai'
-		sample = f
+		align_bed = data_dir+f+'/Alignments/alignments.bed'
+
+		sample = f.replace("_FD","")
 		d_summ = Parse_Diff_Read_Alignment_Summary(summary_file)
+		read_counts = line_count(align_bed)
 		d_summ['Sample'] = sample
+		d_summ['ReadCounts'] = read_counts
 		
 		lengths, cumulative = Assembly_Stats(faifile)
 		NGx = Get_NGx(lengths, cumulative, x)
