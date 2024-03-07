@@ -1,6 +1,6 @@
 from os import listdir
 
-configfile: "config_summarize.json"
+configfile: "configs/config_summarize.json"
 
 reassembly_dir = config["Reassembly_Dir"]
 clustering_dir = config["Clustering_Dir"]
@@ -37,7 +37,7 @@ rule Summarize_Reassmbly:
 
 rule Align_SAGs_To_Synechococcus_Novel_Contigs:
 	input:
-		novel_ctgs=clustering_dir+"/Synechococcus/Novel_Contigs.fna"
+		novel_ctgs=clustering_dir+"/Synechococcus/Representatives.filtered.fa"
 	params:
 		SAG_directory+"{SAG}/IMG_Data/"
 	output:
