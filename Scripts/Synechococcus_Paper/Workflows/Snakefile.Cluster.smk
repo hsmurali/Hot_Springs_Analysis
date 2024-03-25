@@ -1,6 +1,6 @@
 from os import listdir
 
-configfile: "configs/config_cluster.json"
+configfile: "../configs/config_cluster.json"
 genome_id = config["genome_id"]
 reference_scaffolds_dirs = config[genome_id]["data_dir"]
 genomes = config[genome_id]["genome_list"]

@@ -1,6 +1,6 @@
 from os import listdir
 
-configfile: "configs/config.json"
+configfile: "../configs/config.json"
 reads_dir=config['reads_dir']
 files = listdir(reads_dir)
 samples = []

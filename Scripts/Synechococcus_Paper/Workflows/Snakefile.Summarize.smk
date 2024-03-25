@@ -1,6 +1,6 @@
 from os import listdir
 
-configfile: "configs/config_summarize.json"
+configfile: "../configs/config_summarize.json"
 
 reassembly_dir = config["Reassembly_Dir"]
 clustering_dir = config["Clustering_Dir"]
