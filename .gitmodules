@@ -1,0 +1,3 @@
+[submodule "Scripts/Synechococcus_Paper/Differential_Read_Counting"]
+	path = Scripts/Synechococcus_Paper/Differential_Read_Counting
+	url = https://github.com/hsmurali/differential_read_counting
