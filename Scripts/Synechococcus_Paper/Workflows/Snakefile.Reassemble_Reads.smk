@@ -70,7 +70,7 @@ rule Diff_Read_Counting:
         bed=config["out_dir"]+"{sample}/Alignments/alignments.bed"
     params:
         G=config["genome"],
-        prog="/fs/cbcb-software/RedHat-7-x86_64/users/hsmurali/Differential_Read_Counting/bin/Differential_Read_Mapping.py",
+        prog="../Differential_Read_Counting/bin/Differential_Read_Mapping.py",
     output:
         directory(config["out_dir"]+"{sample}/Differential_Read_Counting/"),
         config["out_dir"]+"{sample}/Differential_Read_Counting/Genome."+config["genome"]+".Coverage",
@@ -188,7 +188,7 @@ rule Reference_Guided_Scaffolding:
         assembly=config["out_dir"]+"{sample}/Megahit_Contigs/final.contigs.fa",
         graph=config["out_dir"]+"{sample}/denovo_scaffolds/oriented.gml",
     params:
-        prog="/fs/cbcb-scratch/hsmurali/Hot_Springs_Analysis/Scripts/Strain-Analysis/Synechococcus_Paper/Reference_Guided_Scaffolding/Scaffold_References.py",
+        prog="../Reference_Guided_Scaffolding/Scaffold_References.py",
         genome_ref=config["genome_file_path"],
         genome=config["genome"],
     output:
