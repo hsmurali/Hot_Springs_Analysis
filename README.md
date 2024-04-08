@@ -8,6 +8,4 @@ In this repository we maintain all the workflows to peform a reference reliant a
 2. ```Snakefile.Cluster.smk```- Snakemake workflow to cluster the putative-variants identified by the previous step and annotates the variants using EggNOG. The config files associated with the workflow is available in the ```Scripts/Synechococcus_Paper/configs/config_cluster.json```
 3. ```Snakefile.Summarize.smk```- Snakemake workflow to summarize the results from the previous steps and produces data files required for generating our figures/plots. The config files associated with the workflow is available in the ```Scripts/Synechococcus_Paper/configs/config_summarize.json```
 
-The workflows also relies on [this](https://github.com/hsmurali/differential_read_counting) software package that summarizes information about read alignments. We'll add more support to include this as a submodule in later releases. 
-
-This is a work in progress and reach out to hsmurali@umd.edu incase of any specific questions. 
+This is a work in progress and reach out to hsmurali@umd.edu in case of any questions. 

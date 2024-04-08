@@ -150,7 +150,7 @@ rule Denovo_Scaffolding:
         R1=config["out_dir"]+"{sample}/Alignments/R1.fq.gz",
         R2=config["out_dir"]+"{sample}/Alignments/R2.fq.gz"
     params:
-        prog="/fs/cbcb-software/RedHat-7-x86_64/users/hsmurali/MetaCarvel/run.py",
+        prog="../MetaCarvel/run.py",
         basename=config["out_dir"]+"{sample}/Megahit_Contigs/contigs",
     output:
         opdir=directory(config["out_dir"]+"{sample}/denovo_scaffolds/"),    
