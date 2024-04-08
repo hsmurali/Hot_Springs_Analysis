@@ -148,6 +148,56 @@ def Calculate_Coordinates(subg, n, u):
 		 'Parent_Type':flag}
 	return d
 
+def Max_Clique_Interval_Graph(group):
+	length = group.iloc[0]['Contig_Length']
+	if len(group) == 1:
+		return pd.Series({'Max_Clique':1, 'Start':group['Start'].tolist()[0], 
+						  'End': group['End'].tolist()[0], 'Num_Assignments': 1, 
+						  'Length':length})
+	
+	group['Diff'] = group['Start'].shift(-1) - group['End']
+	num_assign = len(group)
+	max_clique = -1
+	max_start, max_end = 0, 0
+	clique = -1
+	start, end = 0, 0
+	
+	difference = group['Diff'].tolist()
+	starts = group['Start'].tolist()
+	ends = group['End'].tolist()
+	
+	flag = False
+	for i in range(0,len(difference)):
+		if difference[i] <= 0 and flag == False:
+			clique = 2
+			start = starts[i]
+			end = ends[i]
+			flag = True
+		elif difference[i] <= 0 and flag == True:
+			clique += 1
+		elif difference[i] > 0:
+			if max_clique < clique:
+				max_clique = clique
+				max_start = start
+				max_end = end
+			flag = False
+			clique = -1
+	
+	if max_clique < clique:
+		max_clique = clique
+		max_start = start
+		max_end = end
+			
+	if max_clique == -1:
+		max_clique = 1
+		i = np.argmin(difference)
+		max_start = starts[i]
+		max_end = ends[i]
+	
+	return pd.Series({'Max_Clique':max_clique, 'Start':max_start, 
+					  'End': max_end, 'Num_Assignments':num_assign,
+					  'Length':length})
+	
 def Assign_Coordinates(subg, genome):
 	nodes = subg.nodes()
 	alignments = []
